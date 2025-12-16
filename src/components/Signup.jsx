@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import {useNavigate} from 'react-router-dom';
 
 const Signup = ({switchToLogin}) => {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ const [timer, setTimer] = useState(0);
 
 
   const [errors, setErrors] = useState({});
+  const navigate=useNavigate();
 
    const customSelectStyles = {
     control: (provided, state) => ({
@@ -116,8 +118,10 @@ const [timer, setTimer] = useState(0);
       otp,
       label:"signup"
     });
-    console.log("Signup Successful", res.data);
+    
     toast.success("Signup Successful!");
+    navigate('/message');
+    
   } catch (error) {
     console.error("Verify Error:", error);
     toast.error("OTP Verification Failed, Try again");
@@ -146,11 +150,16 @@ const handleResend = async () => {
     console.log("OTP Resent");
     toast.success("OTP Resent Successfully");
   } catch (error) {
-    console.error(error);
-    toast.error("Failed to resend OTP, Try again");
+    toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
   }
 };
 
+const formatTime=(time)=>{
+  const minutes=Math.floor(time/60);
+  const seconds=time%60;
+  return `${minutes}:${seconds<10?'0':''}${seconds}`;
+
+}
 
 
   const GenderOptions = [
@@ -284,7 +293,7 @@ const handleResend = async () => {
 
         {/* SUBMIT BUTTON */}
         {!otpSent && (
-  <button className="border rounded-full p-2 bg-blue-800 text-white hover:bg-blue-700 transition">
+  <button type="submit" className="border rounded-full p-2 bg-blue-800 text-white hover:bg-blue-700 transition">
     Send OTP
   </button>
 )}
@@ -305,11 +314,12 @@ const handleResend = async () => {
     {/* RESEND OTP LINK */}
     <p className="text-sm text-blue-700 cursor-pointer hover:underline w-fit"
        onClick={handleResend}>
-      {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
+      {timer > 0 ? `Resend OTP in ${formatTime(timer)}` : "Resend OTP"}
     </p>
 
+
     {/* FINAL SUBMIT BUTTON */}
-    <button className="border rounded-full p-2 bg-green-700 text-white hover:bg-green-600 transition">
+    <button type="submit" className="border rounded-full p-2 bg-green-700 text-white hover:bg-green-600 transition">
       Submit
     </button>
   </>
@@ -319,6 +329,8 @@ const handleResend = async () => {
           Already have an account?{" "}
           <span onClick={switchToLogin} className="text-blue-700 font-semibold cursor-pointer">Login</span>
         </p>
+
+
       </form>
     </>
   );

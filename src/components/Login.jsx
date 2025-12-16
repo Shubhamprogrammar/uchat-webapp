@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const Login = ({ switchToSignup }) => {
@@ -9,6 +10,7 @@ const Login = ({ switchToSignup }) => {
     const [timer, setTimer] = useState(0);
     const [errors, setErrors] = useState({});
     const [mobile, setMobile] = useState("");
+    const navigate=useNavigate();
 
     const validate = () => {
         let temp = {};
@@ -39,10 +41,10 @@ const Login = ({ switchToSignup }) => {
                 setOtpSent(true);
                 startTimer();
                     
-                console.log("OTP Sent");
+                toast.success("OTP Sent successfully");
                 
             } catch (error) {
-                console.error("OTP Error:", error);
+                toast.error("Failed to send OTP,Try Again");
             }
             return;
         }
@@ -59,14 +61,15 @@ const Login = ({ switchToSignup }) => {
                 otp,
                 label:"login"
             });
-            console.log("Signup Successful", res.data);
+            toast.success("Login successfully")
+            navigate('/message');
         } catch (error) {
-            console.error("Verify Error:", error);
+            toast.error("OTP verification failed,Try Again");
         }
     };
 
     const startTimer = () => {
-        setTimer(300);
+        setTimer(120);
         let interval = setInterval(() => {
             setTimer((prev) => {
                 if (prev <= 1) {
@@ -84,11 +87,18 @@ const Login = ({ switchToSignup }) => {
         try {
             await axios.post("http://localhost:5000/api/auth/send-otp", {mobile});
             startTimer();
-            console.log("OTP Resent");
+            toast.success("OTP Resent successfully");
         } catch (error) {
-            console.error(error);
+            toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
         }
     };
+
+    const formatTime=(time)=>{
+  const minutes=Math.floor(time/60);
+  const seconds=time%60;
+  return `${minutes}:${seconds<10?'0':''}${seconds}`;
+
+}
 
     return (
         <>
@@ -120,7 +130,7 @@ const Login = ({ switchToSignup }) => {
                         {/* RESEND OTP LINK */}
                         <p className="text-sm text-blue-700 cursor-pointer hover:underline w-fit"
                             onClick={handleResend}>
-                            {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
+                            {timer > 0 ? `Resend OTP in ${formatTime(timer)}` : "Resend OTP"}
                         </p>
 
                         {/* FINAL SUBMIT BUTTON */}

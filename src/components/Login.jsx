@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const Login = ({ switchToSignup }) => {
 
@@ -37,7 +38,9 @@ const Login = ({ switchToSignup }) => {
                 await axios.post("http://localhost:5000/api/auth/send-otp", {mobile});
                 setOtpSent(true);
                 startTimer();
+                    
                 console.log("OTP Sent");
+                
             } catch (error) {
                 console.error("OTP Error:", error);
             }

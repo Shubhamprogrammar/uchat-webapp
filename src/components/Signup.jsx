@@ -4,9 +4,9 @@ import toast from "react-hot-toast";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-const Signup = ({switchToLogin}) => {
+const Signup = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -16,14 +16,14 @@ const Signup = ({switchToLogin}) => {
     city: "",
   });
   const [otpSent, setOtpSent] = useState(false);
-const [otp, setOtp] = useState("");
-const [timer, setTimer] = useState(0);
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
 
 
   const [errors, setErrors] = useState({});
-  const navigate=useNavigate();
+  const navigate = useNavigate();
 
-   const customSelectStyles = {
+  const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
       minHeight: "42px",
@@ -34,7 +34,7 @@ const [timer, setTimer] = useState(0);
       "&:hover": { borderColor: "#60a5fa" },
       transition: "border-color 0.1s ease, box-shadow 0.1s ease",
       boxSizing: "border-box",
-      width: "100%", 
+      width: "100%",
     }),
     valueContainer: (provided) => ({
       ...provided,
@@ -56,7 +56,7 @@ const [timer, setTimer] = useState(0);
       zIndex: 50,
     }),
   };
-  
+
   const validate = () => {
     let temp = {};
 
@@ -86,80 +86,80 @@ const [timer, setTimer] = useState(0);
     });
   };
 
- 
- const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  
-  if (!otpSent) {
-    if (!validate()) return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+
+    if (!otpSent) {
+      if (!validate()) return;
+
+      try {
+        await axios.post("http://localhost:5000/api/auth/send-otp", formData);
+        setOtpSent(true);
+        startTimer();
+        toast.success("OTP Sent Successfully");
+      } catch (error) {
+        console.error("OTP Error:", error);
+        toast.error("Failed to send OTP, Try again");
+      }
+      return;
+    }
+
+
+    if (otp.length !== 6) {
+      setErrors({ otp: "Enter valid 6-digit OTP" });
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/verify-otp", {
+        ...formData,
+        otp,
+        label: "signup"
+      });
+
+      toast.success("Signup Successful!");
+      navigate('/message');
+
+    } catch (error) {
+      console.error("Verify Error:", error);
+      toast.error("OTP Verification Failed, Try again");
+    }
+  };
+
+  const startTimer = () => {
+    setTimer(120);
+    let interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleResend = async () => {
+    if (timer !== 0) return;
 
     try {
       await axios.post("http://localhost:5000/api/auth/send-otp", formData);
-      setOtpSent(true);
       startTimer();
-      toast.success("OTP Sent Successfully");
+      console.log("OTP Resent");
+      toast.success("OTP Resent Successfully");
     } catch (error) {
-      console.error("OTP Error:", error);
-      toast.error("Failed to send OTP, Try again");
+      toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
     }
-    return;
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
   }
-
-  
-  if (otp.length !== 6) {
-    setErrors({ otp: "Enter valid 6-digit OTP" });
-    return;
-  }
-
-  try {
-    const res = await axios.post("http://localhost:5000/api/auth/verify-otp", {
-      ...formData,
-      otp,
-      label:"signup"
-    });
-    
-    toast.success("Signup Successful!");
-    navigate('/message');
-    
-  } catch (error) {
-    console.error("Verify Error:", error);
-    toast.error("OTP Verification Failed, Try again");
-  }
-};
-
-const startTimer = () => {
-  setTimer(120); 
-  let interval = setInterval(() => {
-    setTimer((prev) => {
-      if (prev <= 1) {
-        clearInterval(interval);
-        return 0;
-      }
-      return prev - 1;
-    });
-  }, 1000);
-};
-
-const handleResend = async () => {
-  if (timer !== 0) return;
-
-  try {
-    await axios.post("http://localhost:5000/api/auth/send-otp", formData);
-    startTimer();
-    console.log("OTP Resent");
-    toast.success("OTP Resent Successfully");
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
-  }
-};
-
-const formatTime=(time)=>{
-  const minutes=Math.floor(time/60);
-  const seconds=time%60;
-  return `${minutes}:${seconds<10?'0':''}${seconds}`;
-
-}
 
 
   const GenderOptions = [
@@ -184,9 +184,9 @@ const formatTime=(time)=>{
     <>
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-4 p-10 w-full max-w-md bg-white rounded-lg "
+        className="flex flex-col gap-4 p-10 w-full max-w-md md:m-auto rounded-lg "
       >
-        <h1 className="text-yellow-400 font-bold text-3xl text-center mb-2">
+        <h1 className="text-blue-600 font-bold text-3xl text-center mb-2">
           SignUp
         </h1>
 
@@ -197,7 +197,7 @@ const formatTime=(time)=>{
           placeholder="Enter your Name"
           onChange={handleChange}
           value={formData.name}
-          className="p-2 border border-gray-300 hover:border-blue-400 rounded w-full"
+          className="p-2 border bg-white border-gray-300 hover:border-blue-400 rounded w-full"
         />
         {errors.name && <p className="text-red-600">{errors.name}</p>}
 
@@ -208,7 +208,7 @@ const formatTime=(time)=>{
           placeholder="Enter your Mobile Number"
           onChange={handleChange}
           value={formData.mobile}
-          className="p-2 border border-gray-300 hover:border-blue-400 rounded w-full"
+          className="p-2 border bg-white border-gray-300 hover:border-blue-400 rounded w-full"
         />
         {errors.mobile && <p className="text-red-600">{errors.mobile}</p>}
 
@@ -221,16 +221,16 @@ const formatTime=(time)=>{
           <div className="w-full sm:w-1/2">
             <DatePicker
               selected={formData.dob}
-              showYearDropdown 
+              showYearDropdown
               scrollableYearDropdown
               yearDropdownItemNumber={100}
-              
+
               onChange={(date) =>
                 setFormData({ ...formData, dob: date })
               }
               dateFormat="dd/MM/yyyy"
               placeholderText="Date of Birth"
-              className="p-2 border border-gray-300 hover:border-blue-400 rounded w-full"
+              className="p-2 border bg-white border-gray-300 hover:border-blue-400 rounded w-full"
             />
             {errors.dob && <p className="text-red-600">{errors.dob}</p>}
           </div>
@@ -258,7 +258,7 @@ const formatTime=(time)=>{
         <div className="flex flex-col sm:flex-row gap-2">
           <div className="w-full sm:w-1/2">
             <Select
-            styles={customSelectStyles}
+              styles={customSelectStyles}
               name="state"
               options={StateOptions}
               placeholder="Select State"
@@ -293,37 +293,37 @@ const formatTime=(time)=>{
 
         {/* SUBMIT BUTTON */}
         {!otpSent && (
-  <button type="submit" className="border rounded-full p-2 bg-blue-800 text-white hover:bg-blue-700 transition">
-    Send OTP
-  </button>
-)}
+          <button type="submit" className="border rounded-full p-2 bg-blue-800 text-white hover:bg-blue-700 transition">
+            Send OTP
+          </button>
+        )}
 
-{/* OTP INPUT APPEARS AFTER SENDING OTP */}
-{otpSent && (
-  <>
-    <input
-      type="text"
-      maxLength={6}
-      placeholder="Enter OTP"
-      value={otp}
-      onChange={(e) => setOtp(e.target.value)}
-      className="p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-    />
-    {errors.otp && <p className="text-red-600">{errors.otp}</p>}
+        {/* OTP INPUT APPEARS AFTER SENDING OTP */}
+        {otpSent && (
+          <>
+            <input
+              type="text"
+              maxLength={6}
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="p-2 border border-gray-300 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+            {errors.otp && <p className="text-red-600">{errors.otp}</p>}
 
-    {/* RESEND OTP LINK */}
-    <p className="text-sm text-blue-700 cursor-pointer hover:underline w-fit"
-       onClick={handleResend}>
-      {timer > 0 ? `Resend OTP in ${formatTime(timer)}` : "Resend OTP"}
-    </p>
+            {/* RESEND OTP LINK */}
+            <p className="text-sm text-blue-700 cursor-pointer hover:underline w-fit"
+              onClick={handleResend}>
+              {timer > 0 ? `Resend OTP in ${formatTime(timer)}` : "Resend OTP"}
+            </p>
 
 
-    {/* FINAL SUBMIT BUTTON */}
-    <button type="submit" className="border rounded-full p-2 bg-green-700 text-white hover:bg-green-600 transition">
-      Submit
-    </button>
-  </>
-)}
+            {/* FINAL SUBMIT BUTTON */}
+            <button type="submit" className="border rounded-full p-2 bg-green-700 text-white hover:bg-green-600 transition">
+              Submit
+            </button>
+          </>
+        )}
 
         <p className="text-center">
           Already have an account?{" "}

@@ -104,8 +104,8 @@ const Login = ({ switchToSignup }) => {
         <>
             <form
                 onSubmit={handleSubmit}
-                className="flex flex-col gap-4 p-10 w-full max-w-md bg-white rounded-lg ">
-                <h1 className="text-yellow-400 font-bold text-3xl text-center mb-2">Login</h1>
+                className="flex flex-col gap-4 p-10 w-full max-w-md md:m-auto bg-transparent rounded-lg">
+                <h1 className="text-blue-600 font-bold text-3xl  text-center mb-2">Welcome Back !</h1>
                 <input
                     type="text"
                     value={mobile}

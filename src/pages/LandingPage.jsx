@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Uchat from '../assets/Uchat-logo.png';
 import ChatImage from '../assets/ChatImage.jpg';
 import Signup from '../components/Signup';
 import Login from '../components/Login';
@@ -8,43 +7,49 @@ import { FaComments } from "react-icons/fa";
 const LandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-
-      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-6xl mx-auto  gap-8 shadow-lg bg-white rounded-lg">
-
-
-        {/* Left Section - Signup Form */}
-
-
-
-        <div className={`w-full md:w-1/2 flex flex-col justify-center backdrop-blur-md  h-screen`}>
-
-
-
-
-          {!showLogin ? (
-            <Signup switchToLogin={() => setShowLogin(true)} />
-          ) : (
-            <Login switchToSignup={() => setShowLogin(false)} />
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-amber-50 flex items-center justify-center p-4">
+      <div className="flex flex-col lg:flex-row items-center justify-between w-full max-w-6xl mx-auto gap-12 lg:gap-16">
+        
+        {/* Left Section - Branding & Image */}
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center text-center space-y-8">
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-4 rounded-2xl shadow-lg transform hover:scale-110 transition-transform duration-300">
+                <FaComments className="text-4xl text-white" />
+              </div>
+              <h1 className="text-5xl lg:text-6xl font-bold">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">U</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-900">chat</span>
+              </h1>
+            </div>
+            
+            <p className="text-2xl lg:text-3xl font-semibold text-blue-800 tracking-wide">
+              Connect, Chat & Collaborate
+            </p>
+          </div>
+          
+          <div className="relative group">
+            <div className="relative bg-white p-2">
+              <img
+                src={ChatImage}
+                alt="Chat illustration"
+                className="w-full max-w-lg rounded-xl"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Right Section - Image */}
-        {/* <div className="w-full md:w-1/2 flex justify-center items-center ">
-
-         
-        </div> */}
-        <div className="flex flex-col md:w-1/2 items-center justify-center gap-2 mb-4 text-[]">
-          <div className='flex flex-row gap-2 mb-4'>
-            <FaComments className="text-4xl text-blue-800" />
-            <h1 className='text-4xl font-bold  text-amber-500 '>U<span className='text-4xl font-bold text-blue-800'>chat</span></h1>
+        {/* Right Section - Auth Forms */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-800 h-2"></div>
+            
+            {!showLogin ? (
+              <Signup switchToLogin={() => setShowLogin(true)} />
+            ) : (
+              <Login switchToSignup={() => setShowLogin(false)} />
+            )}
           </div>
-          <p className='text-blue-600 font-medium text-center text-xl tracking-wider'>Connect Chat & Collaborate</p>
-          <img
-            src={ChatImage}
-            alt="Chat"
-            className="w-full max-w-md rounded-lg object-cover"
-          />
         </div>
       </div>
     </div>

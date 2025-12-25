@@ -41,7 +41,7 @@ const LandingPage = () => {
 
         {/* Right Section - Auth Forms */}
         <div className="w-full lg:w-1/2 flex items-center justify-center">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform hover:scale-105 transition-transform duration-300">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-transform duration-300">
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 h-2"></div>
             
             {!showLogin ? (

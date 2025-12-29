@@ -148,7 +148,7 @@ const Signup = ({ switchToLogin }) => {
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
       <div className="text-center mb-3">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+        <h1 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
           Create Account
         </h1>
         <p className="text-gray-600 text-sm">Join us today and get started</p>

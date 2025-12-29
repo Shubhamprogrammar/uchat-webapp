@@ -2,16 +2,14 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Phone, User, MapPin, Mail } from "lucide-react";
 
 const Signup = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
+    username: "",
     dob: null,
     gender: "",
-    state: "",
-    city: "",
   });
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -19,7 +17,6 @@ const Signup = ({ switchToLogin }) => {
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
   const GenderOptions = ["Male", "Female", "Other"];
-  const [place, setPlace] = useState([]);
   const host = "http://localhost:5000";
   const navigate = useNavigate();
 
@@ -30,13 +27,18 @@ const Signup = ({ switchToLogin }) => {
     } else if (!/^[a-zA-Z\s]{3,}$/.test(formData.name)) {
       temp.name = "Name must be at least 3 letters";
     }
+    if (!formData.username.trim()) {
+      temp.username = "Username is required";
+    } else if (formData.username.length < 3) {
+      temp.username = "Username must be at least 3 characters long";
+      }else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      temp.username ="Username can contain only letters, numbers, and underscores";
+    }
     if (!/^\d{10}$/.test(formData.mobile)) {
       temp.mobile = "Mobile number must be 10 digits";
     }
     if (!formData.dob) temp.dob = "DOB is required";
     if (!formData.gender) temp.gender = "Select gender";
-    if (!formData.state) temp.state = "Select state";
-    if (!formData.city) temp.city = "Select city";
     setErrors(temp);
     return Object.keys(temp).length === 0;
   };
@@ -127,24 +129,6 @@ const Signup = ({ switchToLogin }) => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/auth/place");
-
-        setPlace(res.data.places);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchPlaces();
-  }, []);
-
-  const filteredCities = formData.state
-  ? place.filter(p => p.state === formData.state)
-  : place;
-
-
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-100">
       <div className="text-center mb-3">
@@ -160,16 +144,15 @@ const Signup = ({ switchToLogin }) => {
             Full Name<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
               name="name"
-              placeholder="Shaan Maurya"
+              placeholder="Elon Musk"
               onChange={handleChange}
               onFocus={() => setFocusedField('name')}
               onBlur={() => setFocusedField(null)}
               value={formData.name}
-              className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'name'
+              className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'name'
                 ? 'border-blue-500 bg-white shadow-sm'
                 : errors.name
                   ? 'border-red-300'
@@ -190,7 +173,6 @@ const Signup = ({ switchToLogin }) => {
             Mobile Number<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="tel"
               name="mobile"
@@ -199,7 +181,7 @@ const Signup = ({ switchToLogin }) => {
               onFocus={() => setFocusedField('mobile')}
               onBlur={() => setFocusedField(null)}
               value={formData.mobile}
-              className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'mobile'
+              className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'mobile'
                 ? 'border-blue-500 bg-white shadow-sm'
                 : errors.mobile
                   ? 'border-red-300'
@@ -214,6 +196,35 @@ const Signup = ({ switchToLogin }) => {
           )}
         </div>
 
+        {/* Username */}
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Username<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              name="username"
+              placeholder="shaananma"
+              onChange={handleChange}
+              onFocus={() => setFocusedField('username')}
+              onBlur={() => setFocusedField(null)}
+              value={formData.username}
+              className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'username'
+                ? 'border-blue-500 bg-white shadow-sm'
+                : errors.username
+                  ? 'border-red-300'
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
+            />
+          </div>
+          {errors.username && (
+            <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+              {errors.username}
+            </p>
+          )}
+        </div>
+
         {/* DOB and Gender Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* DOB */}
@@ -222,13 +233,13 @@ const Signup = ({ switchToLogin }) => {
               Date of Birth<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
             </label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none z-10" />
               <input
                 type="date"
                 name="dob"
                 onChange={handleChange}
                 value={formData.dob || ''}
-                className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${errors.dob
+                max={new Date().toISOString().split("T")[0]}
+                className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${errors.dob
                   ? 'border-red-300'
                   : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:shadow-sm'
                   }`}
@@ -268,69 +279,6 @@ const Signup = ({ switchToLogin }) => {
           </div>
         </div>
 
-        {/* State and City Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* State */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              State<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
-            </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <select
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${errors.state
-                  ? 'border-red-300'
-                  : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:shadow-sm'
-                  }`}
-              >
-                <option value="">Select State</option>
-                {[...new Set(place.map(p => p.state))].map(state => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {errors.state && (
-              <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                {errors.state}
-              </p>
-            )}
-          </div>
-
-          {/* City */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              City<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
-            </label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-              <select
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${errors.city
-                  ? 'border-red-300'
-                  : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:shadow-sm'
-                  }`}
-              >
-                <option value="">Select City</option>
-                {filteredCities.map((val) => (
-                  <option key={val._id} value={val.name}>{val.name}</option>
-                ))}
-              </select>
-            </div>
-            {errors.city && (
-              <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
-                {errors.city}
-              </p>
-            )}
-          </div>
-        </div>
-
         {/* OTP Section */}
         {otpSent && (
           <div className="pt-2 border-t-2 border-gray-100">
@@ -338,7 +286,6 @@ const Signup = ({ switchToLogin }) => {
               Enter OTP<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 maxLength={6}

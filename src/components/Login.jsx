@@ -38,7 +38,7 @@ const Login = ({ switchToSignup }) => {
             if (!validate()) return;
 
             try {
-                await axios.post(`${host}/api/auth/send-otp`, { mobile });
+                await axios.post(`${host}/api/auth/send-otp`, { mobile, label: "login" });
                 setOtpSent(true);
                 startTimer();
 
@@ -86,7 +86,7 @@ const Login = ({ switchToSignup }) => {
         if (timer !== 0) return;
 
         try {
-            await axios.post(`${host}/api/auth/send-otp`, { mobile });
+            await axios.post(`${host}/api/auth/send-otp`, { mobile, label: "login" });
             startTimer();
             toast.success("OTP Resent successfully");
         } catch (error) {

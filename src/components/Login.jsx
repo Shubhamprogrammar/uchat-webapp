@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Phone, MapPin, Mail } from "lucide-react";
 import toast from 'react-hot-toast';
 
 const Login = ({ switchToSignup }) => {
@@ -113,7 +112,6 @@ const Login = ({ switchToSignup }) => {
                         Mobile Number<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
                     </label>
                     <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                         <input
                             type="tel"
                             name="mobile"
@@ -122,7 +120,7 @@ const Login = ({ switchToSignup }) => {
                             onFocus={() => setFocusedField('mobile')}
                             onBlur={() => setFocusedField(null)}
                             value={mobile}
-                            className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'mobile'
+                            className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'mobile'
                                 ? 'border-blue-500 bg-white shadow-sm'
                                 : errors.mobile
                                     ? 'border-red-300'
@@ -144,14 +142,13 @@ const Login = ({ switchToSignup }) => {
                                 Enter OTP<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type="text"
                                     maxLength={6}
                                     placeholder="000000"
                                     value={otp}
                                     onChange={(e) => setOtp(e.target.value)}
-                                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none tracking-widest text-center text-lg font-semibold ${errors.otp
+                                    className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none tracking-widest text-center text-lg font-semibold ${errors.otp
                                         ? 'border-red-300'
                                         : 'border-gray-200 hover:border-gray-300 focus:border-blue-500 focus:bg-white focus:shadow-sm'
                                         }`}

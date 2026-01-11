@@ -64,6 +64,7 @@ const Login = ({ switchToSignup }) => {
                 label: "login"
             });
             toast.success(res.data.message || "OTP verified successfully");
+            console.log(res.data);
             const token=res.data.token;
             localStorage.setItem("token",token)
             console.log(token);

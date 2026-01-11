@@ -3,12 +3,16 @@ import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaComments, FaEllipsisV, FaSearch } from 'react-icons/fa';
+import { useChat } from '../contexts/ChatContext.jsx';
 
-const ContactList = () => {
+const ContactList = ({onSelectConversation}) => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const {setSelectedChat} = useChat();
+
+ 
 
   const fetchUsers = async (query = "") => {
     try {
@@ -40,7 +44,11 @@ const ContactList = () => {
   }, [search]);
 
   useEffect(()=>{
-
+    try {
+      
+    } catch (error) {
+    
+    }
   },[])
 
   return (
@@ -75,7 +83,7 @@ const ContactList = () => {
         // Contact Items - Example
         users &&  (users.map((user) =>
           
-          <div key={user._id}>
+          <div key={user._id} onClick={()=>onSelectConversation(user._id)}>
             <div className="flex items-center p-3 border-b border-gray-300 hover:bg-gray-100 cursor-pointer">
               <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                 {`${user.name?.[0]}`}

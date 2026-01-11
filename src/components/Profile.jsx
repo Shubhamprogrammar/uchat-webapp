@@ -77,8 +77,8 @@ const Profile = () => {
           <div className="w-36 h-36 mx-auto bg-gray-300 text-amber-600 rounded-full flex items-center justify-center text-6xl font-bold mb-3">
             {user?.username?.charAt(0) || "U"}
           </div>
-          <h2 className="text-3xl font-bold">{user?.name}</h2>
-          <p className="text-xl">@{user?.username}</p>
+          <h2 className="text-3xl font-bold text-blue-900">{user?.name}</h2>
+          <p className="text-xl text-blue-700">@{user?.username}</p>
         </div>
 
         {/* Body */}
@@ -86,7 +86,7 @@ const Profile = () => {
 
           {/* Username */}
           <div className="flex items-center gap-3">
-            <FaUser className="text-indigo-500" />
+            <FaUser className="text-blue-700" />
             <span className="text-2xl font-semibold">Username:</span>
 
             {isEditing ? (
@@ -103,21 +103,21 @@ const Profile = () => {
 
           {/* Mobile (locked) */}
           <div className="flex items-center gap-3">
-            <FaPhone className="text-indigo-500" />
+            <FaPhone className="text-blue-700" />
             <span className="text-2xl font-semibold">Mobile:</span>
             <span className="text-gray-700 text-xl">{user.mobile}</span>
           </div>
 
           {/* Gender (locked) */}
           <div className="flex items-center gap-3">
-            <FaVenusMars className="text-indigo-500" />
+            <FaVenusMars className="text-blue-700" />
             <span className="text-2xl font-semibold">Gender:</span>
             <span className="text-gray-700 text-xl">{user.gender}</span>
           </div>
 
           {/* DOB */}
           <div className="flex items-center gap-3">
-            <FaBirthdayCake className="text-indigo-500" />
+            <FaBirthdayCake className="text-blue-700" />
             <span className="text-2xl font-semibold">DOB:</span>
             <span className="text-gray-700 text-xl">
               {user?.dob ? new Date(user.dob).toDateString() : "N/A"}

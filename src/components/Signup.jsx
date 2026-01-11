@@ -89,7 +89,7 @@ const Signup = ({ switchToLogin }) => {
       });
 
       toast.success(res.data.message || "Signup Successful!");
-      // navigate('/message');
+      navigate('/message');
 
     } catch (error) {
       console.error("Verify Error:", error);

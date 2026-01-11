@@ -35,7 +35,7 @@ const ContactList = () => {
         query = `?search=${search}`
       }
       fetchUsers(query)
-    }, 400);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [search]);
 
@@ -82,7 +82,7 @@ const ContactList = () => {
               </div>
               <div className="ml-4">
                 <p className="text-gray-800 font-medium">{user.username}</p>
-                <p className="text-gray-500 text-sm">Last message preview...</p>
+                <p className="text-gray-500 text-sm">{user.lastMessage}</p>
               </div>
             </div></div>))
 

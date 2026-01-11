@@ -12,6 +12,7 @@ const Login = ({ switchToSignup }) => {
     const [focusedField, setFocusedField] = useState(null);
     const navigate = useNavigate();
     const host = "http://localhost:5000";
+    
 
     const validate = () => {
         let temp = {};
@@ -63,12 +64,16 @@ const Login = ({ switchToSignup }) => {
                 label: "login"
             });
             toast.success(res.data.message || "OTP verified successfully");
-            // navigate('/message');
+            const token=res.data.token;
+            localStorage.setItem("token",token)
+            console.log(token);
+            navigate('/message');
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");
         }
     };
 
+    
     const startTimer = () => {
         setTimer(120);
         let interval = setInterval(() => {

@@ -30,8 +30,6 @@ const sampleUsers = new Array(24).fill(0).map((_, i) => ({
   _id: `user_${i + 1}`,
   name: `User ${i + 1}`,
   mobile: `98${Math.floor(10000000 + Math.random() * 90000000)}`,
-  city: ["Mumbai", "Delhi", "Bengaluru", "Kolkata"][i % 4],
-  state: ["MH", "DL", "KA", "WB"][i % 4],
   last_seen: new Date(Date.now() - i * 60000 * 5).toISOString(),
   is_blocked: i % 7 === 0,
   is_deleted: false,
@@ -313,7 +311,6 @@ function UsersPage({ users, onAction, openModal, formatDate }) {
               <tr key={u._id} className={`border-t border-gray-700 ${u.is_deleted ? 'opacity-50 line-through' : ''}`}>
                 <td className="p-2 align-middle">{u.name}</td>
                 <td className="p-2">{u.mobile}</td>
-                <td className="p-2">{u.city}, {u.state}</td>
                 <td className="p-2 text-sm text-gray-400">{formatDate(u.last_seen)}</td>
                 <td className="p-2">
                   {u.is_deleted ? <Badge label="Deleted" variant="red" /> : (u.is_blocked ? <Badge label="Blocked" variant="yellow" /> : <Badge label="Active" variant="green" />)}

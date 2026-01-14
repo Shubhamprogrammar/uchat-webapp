@@ -5,6 +5,8 @@ import {Toaster} from 'react-hot-toast';
 import ContactList from './components/ContactList.jsx';
 import MessagePage from './pages/MessagePage.jsx';
 import ChatWindow from './components/ChatWindow.jsx';
+import socket from "./utils/socket.jsx";
+
 
 function App() {
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Login = ({ switchToSignup }) => {
     const [otpSent, setOtpSent] = useState(false);
@@ -12,6 +13,7 @@ const Login = ({ switchToSignup }) => {
     const [focusedField, setFocusedField] = useState(null);
     const navigate = useNavigate();
     const host = "http://localhost:5000";
+     const { login } = useAuth();
     
 
     const validate = () => {
@@ -65,8 +67,8 @@ const Login = ({ switchToSignup }) => {
             });
             toast.success(res.data.message || "OTP verified successfully");
             console.log(res.data);
-            const token=res.data.token;
-            localStorage.setItem("token",token)
+            login(res.data.token);
+
             console.log(token);
             navigate('/message');
         } catch (error) {

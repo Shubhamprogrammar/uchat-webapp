@@ -34,21 +34,27 @@ const ChatWindow = ({ conversationId }) => {
   }, [conversationId]);
 
   // 2️⃣ Socket connection + join room
-  useEffect(() => {
-    if (!conversationId) return;
+useEffect(() => {
+  if (!conversationId) return;
 
-    socket.connect();
+  socket.connect();
+
+  socket.on("connect", () => {
+    console.log("Socket connected:", socket.id);
     socket.emit("joinConversation", conversationId);
+  });
 
-    socket.on("receiveMessage", (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]);
-    });
+  socket.on("receiveMessage", (newMessage) => {
+    setMessages((prev) => [...prev, newMessage]);
+  });
 
-    return () => {
-      socket.off("receiveMessage");
-      socket.disconnect();
-    };
-  }, [conversationId]);
+  return () => {
+    socket.off("receiveMessage");
+    socket.disconnect();
+  };
+}, [conversationId]);
+
+
 
   // 3️⃣ Send message
   const handleSubmit = async () => {

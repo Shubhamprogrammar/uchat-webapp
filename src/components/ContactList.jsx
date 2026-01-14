@@ -4,6 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { FaComments, FaEllipsisV, FaSearch } from 'react-icons/fa';
 import { useChat } from '../contexts/ChatContext.jsx';
+import socket from '../utils/socket.jsx';
 
 const ContactList = ({onSelectConversation}) => {
   const [users, setUsers] = useState([]);
@@ -43,13 +44,20 @@ const ContactList = ({onSelectConversation}) => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  useEffect(()=>{
-    try {
-      
-    } catch (error) {
-    
-    }
-  },[])
+useEffect(() => {
+  socket.on("conversation_list", (data) => {
+    setUsers(data);
+  });
+
+  socket.on("user_list", (data) => {
+    setUsers(data);
+  });
+
+  return () => {
+    socket.off("conversation_list");
+    socket.off("user_list");
+  };
+}, []);
 
   return (
     <section>

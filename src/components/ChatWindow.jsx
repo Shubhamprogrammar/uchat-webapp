@@ -2,20 +2,22 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import socket from "../utils/socket.jsx";
 
-const ChatWindow = ({ conversationId }) => {
+const ChatWindow = ({ receiverId }) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
   const [input, setInput] = useState("");
 
   // 1️⃣ Fetch old messages
   useEffect(() => {
-    if (!conversationId) return;
+    console.log("Receiver ID:", receiverId);
+    if (!receiverId) return;
 
     const fetchMessages = async () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/message/get-messages/${conversationId}`,
+          `http://localhost:5000/api/message/get-messages/${receiverId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -23,6 +25,8 @@ const ChatWindow = ({ conversationId }) => {
           }
         );
         setMessages(res.data.messages);
+        socket.emit("joinConversation", res.data.conversationId);
+        setConversationId(res.data.conversationId);
       } catch (err) {
         console.error(err);
       } finally {
@@ -31,11 +35,11 @@ const ChatWindow = ({ conversationId }) => {
     };
 
     fetchMessages();
-  }, [conversationId]);
+  }, [receiverId]);
 
   // 2️⃣ Socket connection + join room
 useEffect(() => {
-  if (!conversationId) return;
+  if (!receiverId) return;
 
   socket.connect();
 
@@ -50,9 +54,9 @@ useEffect(() => {
 
   return () => {
     socket.off("receiveMessage");
-    socket.disconnect();
+    // socket.disconnect();
   };
-}, [conversationId]);
+}, [receiverId]);
 
 
 
@@ -64,7 +68,7 @@ useEffect(() => {
       await axios.post(
         "http://localhost:5000/api/message/send-message",
         {
-          receiverId: conversationId,
+          receiverId: receiverId,
           messageType: "text",
           text: input,
         },

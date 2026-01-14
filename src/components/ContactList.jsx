@@ -25,6 +25,7 @@ const ContactList = ({onSelectConversation}) => {
       }
     }
     );
+    console.log(response.data);
     setUsers(response.data);
      } catch (err) {
       console.error(err);
@@ -45,17 +46,12 @@ const ContactList = ({onSelectConversation}) => {
   }, [search]);
 
 useEffect(() => {
-  socket.on("conversation_list", (data) => {
-    setUsers(data);
-  });
-
-  socket.on("user_list", (data) => {
-    setUsers(data);
+  socket.on("onlineUsers", (data) => {
+    setUsers((prev)=>[...prev,...data]);
   });
 
   return () => {
-    socket.off("conversation_list");
-    socket.off("user_list");
+    socket.off("onlineUsers");
   };
 }, []);
 
@@ -91,7 +87,7 @@ useEffect(() => {
         // Contact Items - Example
         users &&  (users.map((user) =>
           
-          <div key={user._id} onClick={()=>onSelectConversation(user._id)}>
+          <div key={user._id} onClick={()=>onSelectConversation(user.receiver)}>
             <div className="flex items-center p-3 border-b border-gray-300 hover:bg-gray-100 cursor-pointer">
               <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                 {`${user.name?.[0]}`}
@@ -106,7 +102,7 @@ useEffect(() => {
 
 
       }
-      <p>{console.log(users)}</p>
+      
 
     </section>
   )

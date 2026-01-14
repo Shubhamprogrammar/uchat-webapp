@@ -29,7 +29,7 @@ const MessagePage = () => {
     <div className='grid grid-cols-3 gap-10 p-2'>
        <ContactList onSelectConversation={setActiveConversationId} />
 
-      <ChatWindow conversationId={activeConversationId} />
+      <ChatWindow receiverId={activeConversationId} />
 
       <Profile />
     </div>

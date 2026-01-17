@@ -67,9 +67,8 @@ const Login = ({ switchToSignup }) => {
             });
             toast.success(res.data.message || "OTP verified successfully");
             console.log(res.data);
-            login(res.data.token);
-
-            console.log(token);
+            console.log(res.data.token);
+            login(res.data);
             navigate('/message');
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");

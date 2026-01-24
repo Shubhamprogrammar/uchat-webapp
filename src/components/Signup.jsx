@@ -65,7 +65,7 @@ const Signup = ({ switchToLogin }) => {
       if (!validate()) return;
 
       try {
-        await axios.post(`${host}/api/auth/send-otp`, formData);
+        await axios.post(`${host}/api/auth/send-otp`, {...formData, label: "signup"});
         setOtpSent(true);
         startTimer();
         toast.success("OTP Sent Successfully");
@@ -114,7 +114,7 @@ const Signup = ({ switchToLogin }) => {
     if (timer !== 0) return;
 
     try {
-      await axios.post(`${host}/api/auth/send-otp`, formData);
+      await axios.post(`${host}/api/auth/send-otp`, {...formData, label: "signup"});
       startTimer();
       console.log("OTP Resent");
       toast.success("OTP Resent Successfully");

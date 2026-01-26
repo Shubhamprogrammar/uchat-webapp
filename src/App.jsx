@@ -1,13 +1,25 @@
-import { useState } from 'react'
-import './App.css'
-import DashboardPage from './pages/DashboardPage'
+import React from 'react';
+import  {Routes,Route} from 'react-router-dom';
+import LandingPage from './pages/LandingPage.jsx';
+import {Toaster} from 'react-hot-toast';
+import ContactList from './components/ContactList.jsx';
+import MessagePage from './pages/MessagePage.jsx';
+import ChatWindow from './components/ChatWindow.jsx';
+import socket from "./utils/socket.jsx";
+
 
 function App() {
 
-  return (
-    <div>
-      <DashboardPage />
-    </div>
+  return ( 
+    <>
+    <Toaster position="top-right" reverseOrder={false} />
+    <Routes>
+      <Route path='/' element={<LandingPage/>}/>
+      <Route path='/message' element={<MessagePage/>}/>
+      <Route path='/contact' element={<ContactList/>}/>
+      <Route path='/message/chat' element={<ChatWindow/>}/>
+    </Routes>
+    </>
   )
 }
 

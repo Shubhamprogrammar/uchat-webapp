@@ -5,7 +5,7 @@ import {Toaster} from 'react-hot-toast';
 import ContactList from './components/ContactList.jsx';
 import MessagePage from './pages/MessagePage.jsx';
 import ChatWindow from './components/ChatWindow.jsx';
-import socket from "./utils/socket.jsx";
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 function App() {
@@ -14,10 +14,22 @@ function App() {
     <>
     <Toaster position="top-right" reverseOrder={false} />
     <Routes>
+
       <Route path='/' element={<LandingPage/>}/>
-      <Route path='/message' element={<MessagePage/>}/>
-      <Route path='/contact' element={<ContactList/>}/>
-      <Route path='/message/chat' element={<ChatWindow/>}/>
+      <Route path='/message' element={
+        <ProtectedRoute>
+        <MessagePage/>
+        </ProtectedRoute>
+        }/>
+      <Route path='/contact' element={
+        <ProtectedRoute>
+        <ContactList/>
+        </ProtectedRoute>}/>
+      <Route path='/message/chat' element={
+        <ProtectedRoute>
+        <ChatWindow/>
+        </ProtectedRoute>
+        }/>
     </Routes>
     </>
   )

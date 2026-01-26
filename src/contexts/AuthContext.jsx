@@ -7,24 +7,16 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   // 🔐 LOGIN FUNCTION
-  const login = (token) => {
-    localStorage.setItem("token", token);
+  const login = (data) => {
+    localStorage.setItem("token", data.token);
 
-    const decoded = jwtDecode(token);
+    setUser(data.user)
 
-    setUser({
-      id: decoded._id,   //  match backend token
-    });
   };
+  
 
   // Restore user on refresh
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      const decoded = jwtDecode(token);
-      setUser({ id: decoded._id });
-    }
-  }, []);
+
 
   return (
     <AuthContext.Provider value={{ user, login, setUser }}>

@@ -8,14 +8,20 @@ import { useAuth } from '../contexts/AuthContext.jsx';
 
 const MessagePage = () => {
 
-  const [activeConversationId, setActiveConversationId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleUserSelect=(user)=>{
+    setSelectedUser(user);
+  }
+
+  
 
   const { user } = useAuth();
   const userId = user?.id; 
   // or from auth context
 
   useEffect(() => {
-    // 🔥 CONNECT SOCKET ONCE
+    // CONNECT SOCKET ONCE
     socket.connect();
 
     // 🔥 JOIN USER ROOM (CRITICAL)
@@ -26,10 +32,13 @@ const MessagePage = () => {
     };
   }, [userId]);
   return (
-    <div className='grid grid-cols-3 gap-10 p-2'>
-       <ContactList onSelectConversation={setActiveConversationId} />
+    <div className='grid grid-cols-3 p-2'>
+       <ContactList onUserSelect={handleUserSelect} />
 
-      <ChatWindow receiverId={activeConversationId} />
+      <ChatWindow 
+      receiverId={selectedUser?.receiverId} 
+      username={selectedUser?.username} 
+      />
 
       <Profile />
     </div>

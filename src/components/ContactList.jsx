@@ -21,9 +21,7 @@ const ContactList = ({ onUserSelect }) => {
         }
       }
       );
-      // socket.emit("onlineUsers", response.data);
       setUsers(response.data);
-      console.log("receivedata",response.data);
     } catch (err) {
       console.error(err);
       toast.error("User not found")

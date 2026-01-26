@@ -10,11 +10,6 @@ const ChatWindow = ({ receiverId,username }) => {
   const [input, setInput] = useState("");
   const token = localStorage.getItem("token");
 
-<<<<<<< HEAD
-  //  Fetch old messages
-  useEffect(() => {
-    console.log("Receiver ID:", receiverId);
-=======
   // Fetch old messages
 
     useEffect(() => {
@@ -28,7 +23,6 @@ const ChatWindow = ({ receiverId,username }) => {
   
 
 useEffect(() => {
->>>>>>> e24bddae44c73154ca6a836cdaa7c9b95ed67ba8
     if (!receiverId) return;
 
     const loadConversation = async () => {
@@ -44,7 +38,6 @@ useEffect(() => {
         if (res.data.conversationId) {
           setConversationId(res.data.conversationId);
           setMessages(res.data.messages);
-          console.log("messages",res.data.messages);
           socket.emit("joinConversation", res.data.conversationId);
         } else {
           setMessages([]);

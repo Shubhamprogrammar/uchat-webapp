@@ -116,7 +116,6 @@ const Signup = ({ switchToLogin }) => {
     try {
       await axios.post(`${host}/api/auth/send-otp`, formData);
       startTimer();
-      console.log("OTP Resent");
       toast.success("OTP Resent Successfully");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");

@@ -8,7 +8,7 @@ const ChatWindow = ({ receiverId }) => {
   const [conversationId, setConversationId] = useState(null);
   const [input, setInput] = useState("");
 
-  // 1️⃣ Fetch old messages
+  //  Fetch old messages
   useEffect(() => {
     console.log("Receiver ID:", receiverId);
     if (!receiverId) return;
@@ -37,7 +37,7 @@ const ChatWindow = ({ receiverId }) => {
     fetchMessages();
   }, [receiverId]);
 
-  // 2️⃣ Socket connection + join room
+  //  Socket connection + join room
 useEffect(() => {
   if (!receiverId) return;
 

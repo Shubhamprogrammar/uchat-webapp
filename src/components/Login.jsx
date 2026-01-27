@@ -13,7 +13,7 @@ const Login = ({ switchToSignup }) => {
     const [focusedField, setFocusedField] = useState(null);
     const navigate = useNavigate();
     const HOST = import.meta.env.VITE_BACKEND_URL;
-    //  const { login } = useAuth();
+     const { login } = useAuth();
     
 
     const validate = () => {
@@ -66,7 +66,7 @@ const Login = ({ switchToSignup }) => {
                 label: "login"
             });
             toast.success(res.data.message || "OTP verified successfully");
-            localStorage.setItem("token",res.data.token);
+            login(res.data);
             navigate('/message');
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");

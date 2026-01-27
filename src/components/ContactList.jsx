@@ -10,12 +10,11 @@ const ContactList = ({ onUserSelect }) => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const token = localStorage.getItem('token');
-  const navigate = useNavigate();
-  const { setSelectedChat } = useChat();
+  const HOST = import.meta.env.VITE_BACKEND_URL;
 
   const fetchUsers = async (query = "") => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/auth/user${query}`, {
+      const response = await axios.get(`${HOST}/api/auth/user${query}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -38,16 +37,6 @@ const ContactList = ({ onUserSelect }) => {
     }, 1000);
     return () => clearTimeout(timer);
   }, [search]);
-
-  // useEffect(() => {
-  //   socket.on("onlineUsers", (data) => {
-  //     setUsers((prev) => [...prev, data]);
-  //   });
-
-  //   return () => {
-  //     socket.off("onlineUsers");
-  //   };
-  // }, []);
 
   return (
     <section className='border-r border-r-gray-400'>

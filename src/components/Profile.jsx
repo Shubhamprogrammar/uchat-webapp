@@ -12,9 +12,7 @@ const Profile = () => {
   const [user, setUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
-
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const HOST = import.meta.env.VITE_BACKEND_URL;
 
   const token = localStorage.getItem("token");
 
@@ -22,7 +20,7 @@ const Profile = () => {
   const fetchUserData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/auth/self-user`,
+        `${HOST}/api/auth/self-user`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +50,7 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/auth/update-profile`,
+        `${HOST}/api/auth/update-profile`,
         formData,
         {
           headers: {

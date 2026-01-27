@@ -12,8 +12,8 @@ const Login = ({ switchToSignup }) => {
     const [mobile, setMobile] = useState("");
     const [focusedField, setFocusedField] = useState(null);
     const navigate = useNavigate();
-    const host = "http://localhost:5000";
-     const { login } = useAuth();
+    const HOST = import.meta.env.VITE_BACKEND_URL;
+    //  const { login } = useAuth();
     
 
     const validate = () => {
@@ -41,7 +41,7 @@ const Login = ({ switchToSignup }) => {
             if (!validate()) return;
 
             try {
-                await axios.post(`${host}/api/auth/send-otp`, { mobile, label: "login" });
+                await axios.post(`${HOST}/api/auth/send-otp`, { mobile, label: "login" });
                 setOtpSent(true);
                 startTimer();
 
@@ -60,13 +60,13 @@ const Login = ({ switchToSignup }) => {
         }
 
         try {
-            const res = await axios.post(`${host}/api/auth/verify-otp`, {
+            const res = await axios.post(`${HOST}/api/auth/verify-otp`, {
                 mobile,
                 otp,
                 label: "login"
             });
             toast.success(res.data.message || "OTP verified successfully");
-            login(res.data);
+            localStorage.setItem("token",res.data.token);
             navigate('/message');
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");
@@ -91,7 +91,7 @@ const Login = ({ switchToSignup }) => {
         if (timer !== 0) return;
 
         try {
-            await axios.post(`${host}/api/auth/send-otp`, { mobile, label: "login" });
+            await axios.post(`${HOST}/api/auth/send-otp`, { mobile, label: "login" });
             startTimer();
             toast.success("OTP Resent successfully");
         } catch (error) {

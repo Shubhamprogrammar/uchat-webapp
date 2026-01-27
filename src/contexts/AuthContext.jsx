@@ -13,10 +13,6 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user)
 
   };
-  
-
-  // Restore user on refresh
-
 
   return (
     <AuthContext.Provider value={{ user, login, setUser }}>

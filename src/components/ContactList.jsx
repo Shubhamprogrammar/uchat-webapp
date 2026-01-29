@@ -1,54 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+
 import toast from 'react-hot-toast';
 import { FaComments, FaEllipsisV, FaSearch } from 'react-icons/fa';
-import { useChat } from '../contexts/ChatContext.jsx';
-import socket from '../utils/socket.jsx';
 
-const ContactList = ({ onUserSelect }) => {
-  const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState('');
-  const token = localStorage.getItem('token');
-  const navigate = useNavigate();
-  const { setSelectedChat } = useChat();
-
-  const fetchUsers = async (query = "") => {
-    try {
-      const response = await axios.get(`http://localhost:5000/api/auth/user${query}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-      );
-      setUsers(response.data);
-    } catch (err) {
-      console.error(err);
-      toast.error("User not found")
-    }
-  }
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      let query = "";
-      if (search.trim()) {
-        query = `?search=${search}`
-      }
-      fetchUsers(query)
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  // useEffect(() => {
-  //   socket.on("onlineUsers", (data) => {
-  //     setUsers((prev) => [...prev, data]);
-  //   });
-
-  //   return () => {
-  //     socket.off("onlineUsers");
-  //   };
-  // }, []);
-
+const ContactList = ({ onUserSelect ,lastMessage,search,setSearch,users}) => {
+  
   return (
     <section className='border-r border-r-gray-400'>
       <div className='flex justify-between mr-5'>
@@ -78,7 +34,7 @@ const ContactList = ({ onUserSelect }) => {
 
       </div>
       {users?.map((user) => (
-        <section
+        <div
           key={user._id}
            onClick={() =>
             onUserSelect({
@@ -95,10 +51,11 @@ const ContactList = ({ onUserSelect }) => {
 
             <div className="ml-4">
               <p className="text-gray-800 font-medium">{user.username}</p>
-              <p className="text-gray-500 text-sm">{user.lastMessage}</p>
+              <p className="text-gray-500 text-sm">{lastMessage?.[user._id] ||
+                  user.lastMessage }</p>
             </div>
           </div>
-        </section>
+        </div>
       ))}
 
 

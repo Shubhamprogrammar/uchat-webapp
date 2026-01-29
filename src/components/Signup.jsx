@@ -17,7 +17,7 @@ const Signup = ({ switchToLogin }) => {
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
   const GenderOptions = ["Male", "Female", "Other"];
-  const host = "http://localhost:5000";
+  const HOST = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   const validate = () => {
@@ -65,7 +65,7 @@ const Signup = ({ switchToLogin }) => {
       if (!validate()) return;
 
       try {
-        await axios.post(`${host}/api/auth/send-otp`, formData);
+        await axios.post(`${HOST}/api/auth/send-otp`, {...formData, label: "signup"});
         setOtpSent(true);
         startTimer();
         toast.success("OTP Sent Successfully");
@@ -114,7 +114,7 @@ const Signup = ({ switchToLogin }) => {
     if (timer !== 0) return;
 
     try {
-      await axios.post(`${host}/api/auth/send-otp`, formData);
+      await axios.post(`${HOST}/api/auth/send-otp`, {...formData, label: "signup"});
       startTimer();
       toast.success("OTP Resent Successfully");
     } catch (error) {

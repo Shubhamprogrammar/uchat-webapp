@@ -7,13 +7,14 @@ const ChatWindow = ({ receiverId, username, messages}) => {
   
   const [input, setInput] = useState("");
   const token = localStorage.getItem("token");
+  const HOST = import.meta.env.VITE_BACKEND_URL;
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/message/send-message",
+        `${HOST}/api/message/send-message`,
         {
           receiverId,
           text: input,

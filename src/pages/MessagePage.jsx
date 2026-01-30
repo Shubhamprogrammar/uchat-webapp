@@ -11,12 +11,13 @@ const MessagePage = () => {
   const userId = user?.id;
 
   const [selectedUser, setSelectedUser] = useState(null);
-  
+
   const [users, setUsers] = useState([]);
 
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
   const [lastMessage, setLastMessage] = useState({});
+  const [unreadCount, setUnreadCount] = useState({});
   const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
 
@@ -43,10 +44,17 @@ const MessagePage = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
+
+
   /* ---------------- SELECT USER ---------------- */
   const handleUserSelect = async (user) => {
     setSelectedUser(user);
     setMessages([]);
+
+    setUnreadCount(prev => ({
+      ...prev,
+      [user.receiverId]: 0
+    }));
 
     try {
       setLoading(true);
@@ -91,6 +99,20 @@ const MessagePage = () => {
     return () => socket.off("receiveMessage");
   }, [selectedUser, userId]);
 
+useEffect(() => {
+  socket.on("newUnreadMessage", ({ senderId }) => {
+    if (selectedUser?.receiverId !== senderId) {
+      setUnreadCount(prev => ({
+        ...prev,
+        [senderId]: (prev[senderId] || 0) + 1,
+      }));
+    }
+  });
+
+  return () => socket.off("newUnreadMessage");
+}, [selectedUser]);
+
+
   return (
     <div className="grid grid-cols-3 p-2 h-screen">
       <ContactList
@@ -99,13 +121,14 @@ const MessagePage = () => {
         users={users}
         setSearch={setSearch}
         lastMessage={lastMessage}
+        unreadCount={unreadCount}
       />
 
       <ChatWindow
         receiverId={selectedUser?.receiverId}
         username={selectedUser?.username}
         messages={messages}
-        />
+      />
 
       <Profile />
     </div>

@@ -1,10 +1,18 @@
-import React from 'react';
-
+import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { FaComments, FaEllipsisV, FaSearch } from 'react-icons/fa';
 
-const ContactList = ({ onUserSelect ,lastMessage,search,setSearch,users}) => {
-  
+
+const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch, users }) => {
+  const { logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    logout();
+    setOpen(false);
+  }
+
   return (
     <section className='border-r border-r-gray-400'>
       <div className='flex justify-between mr-5'>
@@ -18,7 +26,13 @@ const ContactList = ({ onUserSelect ,lastMessage,search,setSearch,users}) => {
           </h1>
         </div>
         <div>
-          <FaEllipsisV className="text-xl text-gray-500 absolute top-4 cursor-pointer" />
+          <FaEllipsisV className="text-xl text-gray-500 absolute relative top-4 cursor-pointer" onClick={() => setOpen(true)} />
+
+          {open && (
+            <div className='p-2 m-2 absolute top-6  '>
+              <button onClick={handleClick} className='w-full cursor-pointer p-2 border border-blue-500 bg-blue-500 text-white rounded'>Logout</button>
+            </div>
+          )}
         </div>
       </div>
       {/* <h2 className='text-xl font-semibold text-gray-700 ml-2  right-0'>Contacts</h2> */}
@@ -36,7 +50,7 @@ const ContactList = ({ onUserSelect ,lastMessage,search,setSearch,users}) => {
       {users?.map((user) => (
         <div
           key={user._id}
-           onClick={() =>
+          onClick={() =>
             onUserSelect({
               receiverId: user._id,
               username: user.username,
@@ -52,7 +66,12 @@ const ContactList = ({ onUserSelect ,lastMessage,search,setSearch,users}) => {
             <div className="ml-4">
               <p className="text-gray-800 font-medium">{user.username}</p>
               <p className="text-gray-500 text-sm">{lastMessage?.[user._id] ||
-                  user.lastMessage }</p>
+                user.lastMessage}</p>
+                 {unreadCount[user._id] > 0 && (
+              <span className="bg-green-500 text-white text-xs rounded-full px-2">
+                {unreadCount[user._id]}
+              </span>
+            )}
             </div>
           </div>
         </div>

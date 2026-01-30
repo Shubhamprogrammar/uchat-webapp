@@ -11,10 +11,14 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     localStorage.setItem("token", data.token);
 
-    setUser(data.user)
+    setUser(data.user);
 
   };
   
+  const logout=()=>{
+    localStorage.removeItem('token');
+    setUser("");
+  }
 
   // Restore user on refresh
   useEffect(() => {
@@ -48,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
 
   return (
-    <AuthContext.Provider value={{ user, login, setUser }}>
+    <AuthContext.Provider value={{ user, login, setUser ,logout}}>
       {children}
     </AuthContext.Provider>
   );

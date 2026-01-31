@@ -53,7 +53,7 @@ const ChatWindow = ({ receiverId, username, messages }) => {
       ) : (
         <>
           {/* HEADER */}
-          <div className="px-4 py-3 border-b border-b-gray-400 flex items-center">
+          <div className="px-4 py-3 border-b border-b-gray-400 flex items-center ">
             <h2 className="text-blue-600 text-lg font-semibold">
               {username}
             </h2>
@@ -61,7 +61,7 @@ const ChatWindow = ({ receiverId, username, messages }) => {
 
           <div className="flex-1 overflow-y-auto px-4 py-2 ">
             {Object.entries(groupedMessages).map(([dateLabel, msgs]) => (
-              <div key={dateLabel}>
+              <div key={dateLabel} className="space-y-1 scrollbar-hide">
                 <div className="flex justify-center my-4">
                   <span className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded-full">
                     {dateLabel}

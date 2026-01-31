@@ -1,20 +1,27 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading,setLoading]=useState(true);
+  const navigate=useNavigate();
 
   // 🔐 LOGIN FUNCTION
   const login = (data) => {
     localStorage.setItem("token", data.token);
 
-    setUser(data.user)
+    setUser(data.user);
 
   };
   
+  const logout=()=>{
+    localStorage.removeItem('token');
+    setUser("");
+    navigate("/");
+  }
 
   // Restore user on refresh
   useEffect(() => {
@@ -48,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
 
   return (
-    <AuthContext.Provider value={{ user, login, setUser }}>
+    <AuthContext.Provider value={{ user, login, setUser ,logout}}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,15 +6,15 @@ import ContactList from './components/ContactList.jsx';
 import MessagePage from './pages/MessagePage.jsx';
 import ChatWindow from './components/ChatWindow.jsx';
 import ProtectedRoute from './components/ProtectedRoute';
-
+import DesktopOnly from './components/DesktopOnly.jsx';
 
 function App() {
 
   return ( 
     <>
     <Toaster position="top-right" reverseOrder={false} />
+    <DesktopOnly>
     <Routes>
-
       <Route path='/' element={<LandingPage/>}/>
       <Route path='/message' element={
         <ProtectedRoute>
@@ -31,6 +31,7 @@ function App() {
         </ProtectedRoute>
         }/>
     </Routes>
+    </DesktopOnly>
     </>
   )
 }

@@ -82,7 +82,7 @@ const Signup = ({ switchToLogin }) => {
     }
 
     try {
-      const res = await axios.post(`${host}/api/auth/verify-otp`, {
+      const res = await axios.post(`${HOST}/api/auth/verify-otp`, {
         ...formData,
         otp,
         label: "signup"

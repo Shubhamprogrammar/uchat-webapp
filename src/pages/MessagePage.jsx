@@ -9,7 +9,7 @@ import axios from "axios";
 const MessagePage = () => {
   const { user } = useAuth();
   const userId = user?.id;
-  const host =import.meta.env.VITE_BACKEND_URL;
+  const HOST =import.meta.env.VITE_BACKEND_URL;
   const [selectedUser, setSelectedUser] = useState(null);
   
   const [users, setUsers] = useState([]);
@@ -25,7 +25,7 @@ const MessagePage = () => {
   const fetchUsers = async (query = "") => {
     try {
       const res = await axios.get(
-        `${host}/api/auth/user${query}`,
+        `${HOST}/api/auth/user${query}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -59,7 +59,7 @@ const MessagePage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:5000/api/message/get-messages/${user.receiverId}`,
+        `${HOST}/api/message/get-messages/${user.receiverId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

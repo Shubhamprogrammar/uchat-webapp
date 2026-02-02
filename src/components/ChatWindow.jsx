@@ -1,14 +1,15 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import socket from "../utils/socket.jsx";
 import { IoSend } from 'react-icons/io5';
-import { getDateLabel,formatTime } from "../utils/dateUtils.jsx";
+import { getDateLabel, formatTime } from "../utils/dateUtils.jsx";
 
 const ChatWindow = ({ receiverId, username, messages }) => {
 
   const [input, setInput] = useState("");
   const token = localStorage.getItem("token");
   const HOST = import.meta.env.VITE_BACKEND_URL;
+  const messagesRef = useRef(null);
 
   const groupedMessages = messages.reduce((acc, msg) => {
     const dateKey = getDateLabel(msg.createdAt);
@@ -18,6 +19,13 @@ const ChatWindow = ({ receiverId, username, messages }) => {
 
     return acc;
   }, {});
+
+  useEffect(() => {
+    if (messagesRef.current) {
+      messagesRef.current.scrollTop =
+        messagesRef.current.scrollHeight;
+    }
+  }, [messages]);
 
 
   const handleSubmit = async () => {
@@ -42,7 +50,7 @@ const ChatWindow = ({ receiverId, username, messages }) => {
   };
 
   return (
-    <div className="h-full flex flex-col rounded-lg bg-white">
+    <div className="h-full min-h-0 flex flex-col rounded-lg bg-white">
 
       {/* EMPTY STATE */}
       {(!receiverId && !username) ? (
@@ -54,14 +62,17 @@ const ChatWindow = ({ receiverId, username, messages }) => {
         <>
           {/* HEADER */}
           <div className="px-4 py-3 border-b border-b-gray-400 flex items-center ">
-            <h2 className="text-blue-600 text-lg font-semibold">
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+              {username?.[0].toUpperCase()}
+            </div>
+            <h2 className="text-blue-600 text-lg font-semibold pl-2">
               {username}
             </h2>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 py-2 ">
+          <div ref={messagesRef} className="flex-1 overflow-y-auto min-h-0 px-4 py-2">
             {Object.entries(groupedMessages).map(([dateLabel, msgs]) => (
-              <div key={dateLabel} className="space-y-1 scrollbar-hide">
+              <div key={dateLabel} className="space-y-1">
                 <div className="flex justify-center my-4">
                   <span className="bg-gray-200 text-gray-700 text-xs px-3 py-1 rounded-full">
                     {dateLabel}
@@ -76,13 +87,12 @@ const ChatWindow = ({ receiverId, username, messages }) => {
                   >
                     <div
                       className={`px-4 py-4 rounded-lg max-w-[70%] text-sm relative ${msg.sender === receiverId
-                          ? "bg-gray-200 text-black rounded-bl-none"
-                          : "bg-blue-500 text-white rounded-br-none"
+                        ? "bg-gray-200 text-black rounded-bl-none"
+                        : "bg-blue-500 text-white rounded-br-none"
                         }`}
                     >
                       <p>{msg.text}</p>
-
-                      <span className={`text-[10px]  ${msg.sender === receiverId ? "text-black-100":"text-gray-200"} absolute right-2`}>
+                      <span className={`text-[9px]  ${msg.sender === receiverId ? "text-black-100" : "text-gray-200"} absolute right-2`}>
                         {formatTime(msg.createdAt)}
                       </span>
                     </div>
@@ -106,14 +116,7 @@ const ChatWindow = ({ receiverId, username, messages }) => {
             <button
               disabled={!input.trim()}
               onClick={handleSubmit}
-              className="
-            flex items-center justify-center
-            h-11 w-11 rounded-full
-            bg-amber-500 text-white
-            disabled:bg-gray-300 disabled:cursor-not-allowed
-            hover:bg-amber-600 active:scale-95
-            transition
-          "
+              className="flex items-center justify-center h-11 w-11 rounded-full bg-amber-500 text-white disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-amber-600 active:scale-95 transition"
             >
               <IoSend size={20} />
             </button>

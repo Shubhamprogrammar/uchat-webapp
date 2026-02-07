@@ -11,10 +11,11 @@ const Login = ({ switchToSignup }) => {
     const [errors, setErrors] = useState({});
     const [mobile, setMobile] = useState("");
     const [focusedField, setFocusedField] = useState(null);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const HOST = import.meta.env.VITE_BACKEND_URL;
-     const { login } = useAuth();
-    
+    const { login } = useAuth();
+
 
     const validate = () => {
         let temp = {};
@@ -58,6 +59,7 @@ const Login = ({ switchToSignup }) => {
             setErrors({ otp: "Enter valid 6-digit OTP" });
             return;
         }
+        setLoading(true);
 
         try {
             const res = await axios.post(`${HOST}/api/auth/verify-otp`, {
@@ -71,9 +73,12 @@ const Login = ({ switchToSignup }) => {
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");
         }
+        finally {
+            setLoading(false);
+        }
     };
 
-    
+
     const startTimer = () => {
         setTimer(120);
         let interval = setInterval(() => {
@@ -89,6 +94,8 @@ const Login = ({ switchToSignup }) => {
 
     const handleResend = async () => {
         if (timer !== 0) return;
+        setOtp("");
+        setLoading(true);
 
         try {
             await axios.post(`${HOST}/api/auth/send-otp`, { mobile, label: "login" });
@@ -96,6 +103,9 @@ const Login = ({ switchToSignup }) => {
             toast.success("OTP Resent successfully");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -139,7 +149,7 @@ const Login = ({ switchToSignup }) => {
                         </p>
                     )}
                 </div>
-                {!otpSent && <button type="submit" className="border rounded-full p-2 bg-blue-800 text-white hover:bg-blue-700 transition shadow-lg cursor-pointer">Send OTP</button>}
+                {!otpSent && <button type="submit" disabled={loading} className={`border rounded-full p-2 text-white transition shadow-lg ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-800 hover:bg-blue-700 cursor-pointer"}`}>Send OTP</button>}
                 {otpSent && (
                     <>
                         <div className="pt-2 border-t-2 border-gray-100">
@@ -173,8 +183,8 @@ const Login = ({ switchToSignup }) => {
 
                         </div>
                         {/* FINAL SUBMIT BUTTON */}
-                        <button className="border rounded-full p-2 bg-green-700 text-white hover:bg-green-600 transition cursor-pointer">
-                            Submit
+                        <button disabled={loading} className={`border rounded-full p-2 text-white transition ${loading ? "bg-green-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-600 cursor-pointer"}`}>
+                            {loading ? "Submitting..." : "Submit"}
                         </button>
                     </>
                 )}

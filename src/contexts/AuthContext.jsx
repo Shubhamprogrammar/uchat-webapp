@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
+import { connectSocket, disconnectSocket } from "../utils/socket";
 
 const AuthContext = createContext();
 
@@ -13,13 +14,16 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     localStorage.setItem("token", data.token);
 
+
     setUser(data.user);
+        connectSocket();
 
   };
   
   const logout=()=>{
     localStorage.removeItem('token');
     setUser("");
+     disconnectSocket();
     navigate("/");
   }
 
@@ -42,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         setUser({
           id: decoded.id,
         });
+        connectSocket(); 
       }
     } catch (err) {
       console.error("Invalid token", err);

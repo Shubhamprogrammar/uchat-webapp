@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import ContactList from "../components/ContactList";
 import Profile from "../components/Profile";
 import ChatWindow from "../components/ChatWindow";
@@ -8,111 +8,203 @@ import axios from "axios";
 
 const MessagePage = () => {
   const { user } = useAuth();
-  const userId = user?.id;
-  const HOST =import.meta.env.VITE_BACKEND_URL;
-  const [selectedUser, setSelectedUser] = useState(null);
-  
-  const [users, setUsers] = useState([]);
+  // const myId = user?._id || user?.id;
+  const HOST = import.meta.env.VITE_BACKEND_URL;
 
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
-  const [lastMessage, setLastMessage] = useState({});
-  const [unreadCount, setUnreadCount] = useState({});
-  const [loading, setLoading] = useState(false);
-  const token = localStorage.getItem("token");
 
-  /* ---------------- FETCH USERS ---------------- */
-  const fetchUsers = async (query = "") => {
-    try {
-      const res = await axios.get(
-        `${HOST}/api/auth/user${query}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+  const token = localStorage.getItem("token");
+  const activeChatRef = useRef(null);  
+
+  useEffect(() => {
+    activeChatRef.current = selectedUser;
+  }, [selectedUser]);
+
+
+    useEffect(() => {
+    socket.on("sync-active-chat", () => {
+      socket.emit(
+        "active-chat",
+        activeChatRef.current?.conversationId || null
       );
-      setUsers(res.data);
-    } catch (err) {
-      console.error(err);
+    });
+
+    return () => socket.off("sync-active-chat");
+  }, []);
+
+  // FETCH CONTACT LIST
+  const fetchUsers =
+    async (query = "") => {
+      try {
+        const res = await axios.get(`${HOST}/api/auth/user${query}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setUsers(res.data);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  };
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchUsers(search ? `?search=${search}` : "");
-    }, 800);
-
+    }, 300);
     return () => clearTimeout(timer);
   }, [search]);
 
-
-
-  /* ---------------- SELECT USER ---------------- */
+  // SELECT CONTACT
   const handleUserSelect = async (user) => {
     setSelectedUser(user);
+    activeChatRef.current=user;
+    
+
+    socket.emit("active-chat", user.conversationId || null);
     setMessages([]);
 
-    setUnreadCount(prev => ({
-      ...prev,
-      [user.receiverId]: 0
-    }));
 
     try {
-      setLoading(true);
       const res = await axios.get(
         `${HOST}/api/message/get-messages/${user.receiverId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setMessages(res.data.messages || []);
+
+      socket.emit("mark-seen", {
+        conversationId: user.conversationId,
+        senderId: user.receiverId,
+      });
+
+      setUsers(prev =>
+        prev.map(u =>
+          u._id === user.receiverId
+            ? { ...u, unreadCount: 0 }
+            : u
+        )
+      );
+
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!userId) return;
+    const handleReceiveMessage = (msg) => {
+  const activeChat = activeChatRef.current;
 
-    socket.connect();
-    socket.emit("joinUser", userId);
+  // 🔥 First message conversation sync
+  if (msg.isNewConversation) {
+    setUsers(prev =>
+      prev.map(u =>
+        u._id === msg.sender
+          ? { ...u, conversationId: msg.conversationId }
+          : u
+      )
+    );
 
-    return () => socket.disconnect();
-  }, [userId]);
+    if (activeChat?._id === msg.sender) {
+      const updated = { ...activeChat, conversationId: msg.conversationId };
+      activeChatRef.current = updated;
+      setSelectedUser(updated);
+    }
+  }
+
+  const isChatOpen =
+    activeChatRef.current?.conversationId === msg.conversationId;
+
+  if (isChatOpen) {
+    setMessages(prev => [...prev, msg]);
+
+    socket.emit("mark-seen", {
+      conversationId: msg.conversationId,
+      senderId: msg.sender
+    });
+  }
+
+  setUsers(prev =>
+    prev.map(u =>
+      u._id === msg.sender
+        ? {
+            ...u,
+            lastMessage: msg.text,
+            unreadCount: isChatOpen ? 0 : (u.unreadCount || 0) + 1
+          }
+        : u
+    )
+  );
+};
+
+
+    socket.on("receiveMessage", handleReceiveMessage);
+
+    return () => {
+      socket.off("receiveMessage", handleReceiveMessage);
+    };
+  }, []);
+
+  // SOCKET SEND SUCCESS
+useEffect(() => {
+  const handleSendSuccess = (payload) => {
+    let activeChat = activeChatRef.current;
+
+    if (payload.isNewConversation) {
+      const updated = {
+        ...activeChat,
+        conversationId: payload.conversationId
+      };
+
+      activeChatRef.current = updated;
+      setSelectedUser(updated);
+
+      setUsers(prev =>
+        prev.map(u =>
+          u._id === payload.receiver
+            ? { ...u, conversationId: payload.conversationId }
+            : u
+        )
+      );
+    }
+
+    if (activeChatRef.current?.conversationId === payload.conversationId) {
+      setMessages(prev => [...prev, payload]);
+    }
+
+    setUsers(prev =>
+      prev.map(u =>
+        u._id === payload.receiver
+          ? { ...u, lastMessage: payload.text, unreadCount: 0 }
+          : u
+      )
+    );
+  };
+
+  socket.on("send-success", handleSendSuccess);
+
+  return () => socket.off("send-success", handleSendSuccess);
+}, []);
+
+
 
   useEffect(() => {
-    socket.on("receiveMessage", (msg) => {
-      const otherUserId =
-        msg.sender === userId ? msg.receiver : msg.sender;
-
-      setLastMessage((prev) => ({
-        ...prev,
-        [otherUserId]: msg.text || "Media",
-      }));
-
-      if (selectedUser?.receiverId === otherUserId) {
-        setMessages((prev) => [...prev, msg]);
-      }
+    socket.on("unread-reset", ({ conversationId }) => {
+      setUsers(prev =>
+        prev.map(u =>
+          u.conversationId === conversationId
+            ? { ...u, unreadCount: 0 }
+            : u
+        )
+      );
     });
 
-    return () => socket.off("receiveMessage");
-  }, [selectedUser, userId]);
+    return () => socket.off("unread-reset");
+  }, []);
 
-useEffect(() => {
-  socket.on("newUnreadMessage", ({ senderId }) => {
-    if (selectedUser?.receiverId !== senderId) {
-      setUnreadCount(prev => ({
-        ...prev,
-        [senderId]: (prev[senderId] || 0) + 1,
-      }));
-    }
-  });
-
-  return () => socket.off("newUnreadMessage");
-}, [selectedUser]);
-
-
+  
   return (
     <div className="grid grid-cols-3 p-2 h-screen">
       <ContactList
@@ -120,8 +212,6 @@ useEffect(() => {
         search={search}
         users={users}
         setSearch={setSearch}
-        lastMessage={lastMessage}
-        unreadCount={unreadCount}
       />
 
       <ChatWindow

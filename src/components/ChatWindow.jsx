@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
 import socket from "../utils/socket.jsx";
+import { encryptText, decryptText } from "../utils/crypto";
 import { IoSend } from 'react-icons/io5';
 import { getDateLabel, formatTime } from "../utils/dateUtils.jsx";
 
@@ -30,13 +31,14 @@ const ChatWindow = ({ receiverId, username, messages }) => {
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
+    const encryptedText = encryptText(input);
 
     try {
       const res = await axios.post(
         `${HOST}/api/message/send-message`,
         {
           receiverId,
-          text: input,
+          text: encryptedText,
           messageType: "text",
         },
         {
@@ -91,7 +93,7 @@ const ChatWindow = ({ receiverId, username, messages }) => {
                         : "bg-blue-500 text-white rounded-br-none"
                         }`}
                     >
-                      <p>{msg.text}</p>
+                      <p>{decryptText(msg.text)}</p>
                       <span className={`text-[9px]  ${msg.sender === receiverId ? "text-black-100" : "text-gray-200"} absolute right-2`}>
                         {formatTime(msg.createdAt)}
                       </span>

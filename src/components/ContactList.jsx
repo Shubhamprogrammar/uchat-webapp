@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt} from 'react-icons/fa';
-
+import { decryptText } from "../utils/crypto";
 
 const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch, users }) => {
   const { logout } = useAuth();
@@ -83,7 +83,7 @@ const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch
             <div className="ml-4">
               <p className="text-gray-800 font-medium">{user.username}</p>
               <p className="text-gray-500 text-sm">{lastMessage?.[user._id] ||
-                user.lastMessage}</p>
+                decryptText(user.lastMessage)}</p>
               {unreadCount[user._id] > 0 && (
                 <span className="bg-green-500 text-white text-xs rounded-full px-2">
                   {unreadCount[user._id]}

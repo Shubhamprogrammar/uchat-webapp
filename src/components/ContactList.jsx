@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt} from 'react-icons/fa';
 import { decryptText } from "../utils/crypto";
 
-const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch, users }) => {
+const ContactList = ({ onUserSelect, search, setSearch, users }) => {
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
 
@@ -66,11 +66,12 @@ const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch
       </div>
       {users?.map((user) => (
         <div
-          key={user._id}
+          key={user.conversationId || user._id}
           onClick={() =>
             onUserSelect({
-              receiverId: user._id,
+              receiverId: user.receiver,
               username: user.username,
+              conversationId:user.conversationId,
             })
           }
           className="cursor-pointer"
@@ -82,11 +83,11 @@ const ContactList = ({ onUserSelect, lastMessage, unreadCount, search, setSearch
 
             <div className="ml-4">
               <p className="text-gray-800 font-medium">{user.username}</p>
-              <p className="text-gray-500 text-sm">{lastMessage?.[user._id] ||
+              <p className="text-gray-500 text-sm">{
                 decryptText(user.lastMessage)}</p>
-              {unreadCount[user._id] > 0 && (
+              {user.unreadCount > 0 && (
                 <span className="bg-green-500 text-white text-xs rounded-full px-2">
-                  {unreadCount[user._id]}
+                  {user.unreadCount}
                 </span>
               )}
             </div>

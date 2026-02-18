@@ -5,6 +5,18 @@ It enables seamless one-on-one or group conversations with a clean, minimal UI.
 
 ---
 
+## 🌍 Live Website
+
+🔗 **Live Link:** https://uchat-webapp.vercel.app/
+
+---
+
+## 🖼️ Screenshot
+
+<img width="1897" height="840" alt="image" src="https://github.com/user-attachments/assets/f72762d6-3b40-423e-aeaf-604a6096ac5b" />
+
+---
+
 ## 🚀 Features
 
 - 🔥 **Fast and Lightweight** — Built using Vite + React

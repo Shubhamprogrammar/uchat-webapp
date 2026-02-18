@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import socket from "../utils/socket.jsx";
+import { encryptText, decryptText } from "../utils/crypto";
 import { IoSend } from 'react-icons/io5';
 import { getDateLabel, formatTime } from "../utils/dateUtils.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
@@ -36,18 +37,17 @@ const handleSubmit = () => {
     return;
   }
   
-  
+  const encryptedText = encryptText(input);
 
   socket.emit("send-message", {
     receiverId,
-    text: input,
+    text: encryptedText,
     messageType: "text",
   });
 
   
   setInput("");
 };
-
 
 
   return (
@@ -97,7 +97,7 @@ const handleSubmit = () => {
                           : "bg-blue-500 text-white rounded-br-none"
                       }`}
                     >
-                      <p>{msg.text}</p>
+                      <p>{decryptText(msg.text)}</p>
                       <span
                         className={`text-[9px] absolute right-2 ${
                           msg.sender === receiverId

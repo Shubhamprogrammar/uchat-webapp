@@ -17,6 +17,7 @@ const Signup = ({ switchToLogin }) => {
   const [errors, setErrors] = useState({});
   const [focusedField, setFocusedField] = useState(null);
   const GenderOptions = ["Male", "Female", "Other"];
+  const [loading, setLoading] = useState(false);
   const HOST = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
@@ -63,6 +64,7 @@ const Signup = ({ switchToLogin }) => {
 
     if (!otpSent) {
       if (!validate()) return;
+      setLoading(true);
 
       try {
         await axios.post(`${HOST}/api/auth/send-otp`, {...formData, label: "signup"});
@@ -72,6 +74,9 @@ const Signup = ({ switchToLogin }) => {
       } catch (error) {
         toast.error(error.response?.data?.message || "Failed to send OTP, Try again");
       }
+      finally{
+        setLoading(false);
+      }
       return;
     }
 
@@ -80,7 +85,7 @@ const Signup = ({ switchToLogin }) => {
       setErrors({ otp: "Enter valid 6-digit OTP" });
       return;
     }
-
+    setLoading(true);
     try {
       const res = await axios.post(`${HOST}/api/auth/verify-otp`, {
         ...formData,
@@ -95,6 +100,9 @@ const Signup = ({ switchToLogin }) => {
       console.error("Verify Error:", error);
       toast.error(error.response?.data?.message || "OTP Verification Failed, Try again");
     }
+    finally {
+    setLoading(false);
+  }
   };
 
   const startTimer = () => {
@@ -306,36 +314,43 @@ const Signup = ({ switchToLogin }) => {
             {/* Resend OTP */}
             <div className="mt-3 text-center">
               <button
-                type="button"
-                onClick={handleResend}
-                disabled={timer > 0}
-                className={`text-sm cursor-pointer font-medium transition-colors ${timer > 0
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-blue-600 hover:text-blue-700'
-                  }`}
-              >
-                {timer > 0 ? (
-                  <span className="flex items-center justify-center gap-2">
-                    Resend OTP in {formatTime(timer)}
-                  </span>
-                ) : (
-                  'Resend OTP'
-                )}
-              </button>
+  type="button"
+  onClick={handleResend}
+  disabled={timer > 0 || loading}
+  className={`text-sm font-medium transition-colors
+    ${timer > 0 || loading
+      ? "text-gray-400 cursor-not-allowed"
+      : "text-blue-600 hover:text-blue-700 cursor-pointer"}
+  `}
+>
+  {timer > 0 ? `Resend OTP in ${formatTime(timer)}` : "Resend OTP"}
+</button>
             </div>
           </div>
         )}
 
         {/* Submit Button */}
         <button
-          onClick={handleSubmit}
-          className={`w-full py-2 rounded-full cursor-pointer text-white transition-all duration-200 shadow-lg transform ${otpSent
-            ? 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
-            : 'bg-blue-800 hover:bg-blue-700'
-            }`}
-        >
-          {otpSent ? 'Verify & Sign Up' : 'Send OTP'}
-        </button>
+  onClick={handleSubmit}
+  disabled={loading}
+  className={`
+    w-full py-2 rounded-full text-white transition-all duration-200 shadow-lg
+    ${loading
+      ? "bg-gray-400 cursor-not-allowed"
+      : otpSent
+        ? "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 cursor-pointer"
+        : "bg-blue-800 hover:bg-blue-700 cursor-pointer"
+    }
+  `}
+>
+  {loading
+    ? otpSent
+      ? "Verifying..."
+      : "Sending OTP..."
+    : otpSent
+      ? "Verify & Sign Up"
+      : "Send OTP"}
+</button>
 
         {/* Login Link */}
         <div className="text-center pt-1">

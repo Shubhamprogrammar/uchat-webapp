@@ -180,7 +180,7 @@ const Login = ({ switchToSignup }) => {
                     onChange={handleMobileChange}
                     onFocus={() => setFocusedField('mobile')}
                     onBlur={() => setFocusedField(null)}
-                    className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none
+                    className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl transition-all duration-200 outline-none
                         ${otpSent ? "bg-gray-100 border-blue-300 cursor-not-allowed" :
                             focusedField === 'mobile'
                                 ? 'border-blue-500 bg-white shadow-sm'

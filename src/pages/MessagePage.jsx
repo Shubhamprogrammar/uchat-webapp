@@ -16,15 +16,20 @@ const MessagePage = () => {
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
 
+  console.log("users", users)
+
   const token = localStorage.getItem("token");
-  const activeChatRef = useRef(null);  
+  const activeChatRef = useRef(null);
+
+
+
 
   useEffect(() => {
     activeChatRef.current = selectedUser;
   }, [selectedUser]);
 
 
-    useEffect(() => {
+  useEffect(() => {
     socket.on("sync-active-chat", () => {
       socket.emit(
         "active-chat",
@@ -60,13 +65,13 @@ const MessagePage = () => {
   // SELECT CONTACT
   const handleUserSelect = async (user) => {
     setSelectedUser(user);
-    activeChatRef.current=user;
-    
+    activeChatRef.current = user;
+
 
     socket.emit("active-chat", user.conversationId || null);
     setMessages([]);
 
-
+    if (!user.conversationId) return;
     try {
       const res = await axios.get(
         `${HOST}/api/message/get-messages/${user.receiverId}`,
@@ -95,49 +100,49 @@ const MessagePage = () => {
 
   useEffect(() => {
     const handleReceiveMessage = (msg) => {
-  const activeChat = activeChatRef.current;
+      const activeChat = activeChatRef.current;
 
-  // 🔥 First message conversation sync
-  if (msg.isNewConversation) {
-    setUsers(prev =>
-      prev.map(u =>
-        u._id === msg.sender
-          ? { ...u, conversationId: msg.conversationId }
-          : u
-      )
-    );
+      //  First message conversation sync
+      if (msg.isNewConversation) {
+        setUsers(prev =>
+          prev.map(u =>
+            u._id === msg.sender
+              ? { ...u, conversationId: msg.conversationId }
+              : u
+          )
+        );
 
-    if (activeChat?._id === msg.sender) {
-      const updated = { ...activeChat, conversationId: msg.conversationId };
-      activeChatRef.current = updated;
-      setSelectedUser(updated);
-    }
-  }
+        if (activeChat?._id === msg.sender) {
+          const updated = { ...activeChat, conversationId: msg.conversationId };
+          activeChatRef.current = updated;
+          setSelectedUser(updated);
+        }
+      }
 
-  const isChatOpen =
-    activeChatRef.current?.conversationId === msg.conversationId;
+      const isChatOpen =
+        activeChatRef.current?.conversationId === msg.conversationId;
 
-  if (isChatOpen) {
-    setMessages(prev => [...prev, msg]);
+      if (isChatOpen) {
+        setMessages(prev => [...prev, msg]);
 
-    socket.emit("mark-seen", {
-      conversationId: msg.conversationId,
-      senderId: msg.sender
-    });
-  }
+        socket.emit("mark-seen", {
+          conversationId: msg.conversationId,
+          senderId: msg.sender
+        });
+      }
 
-  setUsers(prev =>
-    prev.map(u =>
-      u._id === msg.sender
-        ? {
-            ...u,
-            lastMessage: msg.text,
-            unreadCount: isChatOpen ? 0 : (u.unreadCount || 0) + 1
-          }
-        : u
-    )
-  );
-};
+      setUsers(prev =>
+        prev.map(u =>
+          u._id === msg.sender
+            ? {
+              ...u,
+              lastMessage: msg.text,
+              unreadCount: isChatOpen ? 0 : (u.unreadCount || 0) + 1
+            }
+            : u
+        )
+      );
+    };
 
 
     socket.on("receiveMessage", handleReceiveMessage);
@@ -148,45 +153,45 @@ const MessagePage = () => {
   }, []);
 
   // SOCKET SEND SUCCESS
-useEffect(() => {
-  const handleSendSuccess = (payload) => {
-    let activeChat = activeChatRef.current;
+  useEffect(() => {
+    const handleSendSuccess = (payload) => {
+      let activeChat = activeChatRef.current;
 
-    if (payload.isNewConversation) {
-      const updated = {
-        ...activeChat,
-        conversationId: payload.conversationId
-      };
+      if (payload.isNewConversation) {
+        const updated = {
+          ...activeChat,
+          conversationId: payload.conversationId
+        };
 
-      activeChatRef.current = updated;
-      setSelectedUser(updated);
+        activeChatRef.current = updated;
+        setSelectedUser(updated);
+
+        setUsers(prev =>
+          prev.map(u =>
+            u._id === payload.receiver
+              ? { ...u, conversationId: payload.conversationId }
+              : u
+          )
+        );
+      }
+
+      if (activeChatRef.current?.conversationId === payload.conversationId) {
+        setMessages(prev => [...prev, payload]);
+      }
 
       setUsers(prev =>
         prev.map(u =>
           u._id === payload.receiver
-            ? { ...u, conversationId: payload.conversationId }
+            ? { ...u, lastMessage: payload.text, unreadCount: 0 }
             : u
         )
       );
-    }
+    };
 
-    if (activeChatRef.current?.conversationId === payload.conversationId) {
-      setMessages(prev => [...prev, payload]);
-    }
+    socket.on("send-success", handleSendSuccess);
 
-    setUsers(prev =>
-      prev.map(u =>
-        u._id === payload.receiver
-          ? { ...u, lastMessage: payload.text, unreadCount: 0 }
-          : u
-      )
-    );
-  };
-
-  socket.on("send-success", handleSendSuccess);
-
-  return () => socket.off("send-success", handleSendSuccess);
-}, []);
+    return () => socket.off("send-success", handleSendSuccess);
+  }, []);
 
 
 
@@ -204,7 +209,7 @@ useEffect(() => {
     return () => socket.off("unread-reset");
   }, []);
 
-  
+
   return (
     <div className="grid grid-cols-3 p-2 h-screen">
       <ContactList

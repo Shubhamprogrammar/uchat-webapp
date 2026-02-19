@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt} from 'react-icons/fa';
+import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt } from 'react-icons/fa';
 import { decryptText } from "../utils/crypto";
 
 const ContactList = ({ onUserSelect, search, setSearch, users }) => {
+
   const { logout } = useAuth();
   const [open, setOpen] = useState(false);
+
+  const sortedUsers = [...users].sort((a, b) => {
+    return new Date(b.lastMessage?.createdAt || 0) -
+      new Date(a.lastMessage?.createdAt || 0);
+  });
+
+  
 
   const handleClick = () => {
     logout();
@@ -38,13 +46,13 @@ const ContactList = ({ onUserSelect, search, setSearch, users }) => {
                 <span className="text-xs">✕</span>
               </button>
 
-            <div className="h-px bg-gray-200" />
+              <div className="h-px bg-gray-200" />
 
               <button
                 onClick={handleClick}
                 className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition"
               >
-              <FaSignOutAlt className="text-base" />
+                <FaSignOutAlt className="text-base" />
                 Logout
               </button>
             </div>
@@ -64,14 +72,14 @@ const ContactList = ({ onUserSelect, search, setSearch, users }) => {
           className='pl-10 py-2 m-auto w-full border border-gray-500 font-medium rounded-full' />
 
       </div>
-      {users?.map((user) => (
+      {sortedUsers?.map((user) => (
         <div
           key={user.conversationId || user._id}
           onClick={() =>
             onUserSelect({
               receiverId: user.receiver,
               username: user.username,
-              conversationId:user.conversationId,
+              conversationId: user.conversationId,
             })
           }
           className="cursor-pointer"

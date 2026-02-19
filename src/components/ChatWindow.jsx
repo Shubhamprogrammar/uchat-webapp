@@ -39,7 +39,8 @@ const handleSubmit = () => {
   
   const encryptedText = encryptText(input);
 
-  console.log("enCrpytedText",encryptText)
+  console.log("enCrpytedText",encryptedText)
+  console.log("receiverId",receiverId)
 
   socket.emit("send-message", {
     receiverId,

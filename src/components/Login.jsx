@@ -227,10 +227,10 @@ const Login = ({ switchToSignup }) => {
                             placeholder="000000"
                             value={otp}
                             onChange={handleOtpChange}
-                            className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 text-center text-lg font-semibold tracking-widest
+                            className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl text-center text-lg font-semibold tracking-widest
                                 ${errors.otp
                                     ? 'border-red-300'
-                                    : 'border-gray-300 focus:border-blue-500 focus:bg-white focus:shadow-sm'
+                                    : 'focus:border-blue-500 focus:bg-white focus:shadow-sm'
                                 }`}
                         />
 

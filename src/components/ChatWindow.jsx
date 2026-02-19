@@ -42,11 +42,20 @@ const handleSubmit = () => {
   console.log("enCrpytedText",encryptedText)
   console.log("receiverId",receiverId)
 
+  console.log("Before emit", {
+  receiverId,
+  encryptedText,
+  connected: socket.connected
+});
+
   socket.emit("send-message", {
     receiverId,
     text: encryptedText,
     messageType: "text",
   });
+
+  console.log("After emit - send-message triggered");
+
 
   
   setInput("");

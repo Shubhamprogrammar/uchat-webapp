@@ -28,34 +28,23 @@ const handleSubmit = () => {
   if (!input.trim()) return;
 
   if (!receiverId) {
-    console.log("No receiver selected");
+    console.error("No receiver selected");
     return;
   }
 
   if (!socket.connected) {
-    console.log("Socket not connected");
+    console.error("Socket not connected");
     return;
   }
   
   const encryptedText = encryptText(input);
 
-  console.log("enCrpytedText",encryptedText)
-  console.log("receiverId",receiverId)
-
-  console.log("Before emit", {
-  receiverId,
-  encryptedText,
-  connected: socket.connected
-});
 
   socket.emit("send-message", {
     receiverId,
     text: encryptedText,
     messageType: "text",
   });
-
-  console.log("After emit - send-message triggered");
-
 
   
   setInput("");

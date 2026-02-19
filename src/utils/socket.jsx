@@ -19,7 +19,6 @@ socket.on("connect_error", (err) => {
 export const connectSocket = () => {
   const token = localStorage.getItem("token");
 
-  //  console.log("Connecting socket with token:", token);
 
   if (!token) return;
 
@@ -33,8 +32,6 @@ export const connectSocket = () => {
 export const disconnectSocket = () => {
   if (socket.connected) socket.disconnect();
 };
-
-
 
 
 export default socket;

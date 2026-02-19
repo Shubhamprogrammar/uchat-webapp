@@ -154,7 +154,6 @@ const MessagePage = () => {
   // SOCKET SEND SUCCESS
   useEffect(() => {
     const handleSendSuccess = (payload) => {
-      console.log("payload from sender",payload)
       let activeChat = activeChatRef.current;
 
       if (payload.isNewConversation) {

@@ -16,7 +16,6 @@ const MessagePage = () => {
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
 
-  console.log("users", users)
 
   const token = localStorage.getItem("token");
   const activeChatRef = useRef(null);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const Login = ({ switchToSignup }) => {
     const [otpSent, setOtpSent] = useState(false);
@@ -12,6 +13,8 @@ const Login = ({ switchToSignup }) => {
     const [focusedField, setFocusedField] = useState(null);
     const navigate = useNavigate();
     const host = "http://localhost:5000";
+     const { login } = useAuth();
+    
 
     const validate = () => {
         let temp = {};
@@ -63,12 +66,14 @@ const Login = ({ switchToSignup }) => {
                 label: "login"
             });
             toast.success(res.data.message || "OTP verified successfully");
-            // navigate('/message');
+            login(res.data);
+            navigate('/message');
         } catch (error) {
             toast.error(error.response?.data?.message || "OTP verification failed, Try again");
         }
     };
 
+    
     const startTimer = () => {
         setTimer(120);
         let interval = setInterval(() => {

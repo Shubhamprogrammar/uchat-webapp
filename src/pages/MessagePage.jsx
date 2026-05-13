@@ -16,12 +16,8 @@ const MessagePage = () => {
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
 
-
   const token = localStorage.getItem("token");
   const activeChatRef = useRef(null);
-
-
-
 
   useEffect(() => {
     activeChatRef.current = selectedUser;
@@ -209,22 +205,50 @@ const MessagePage = () => {
   }, []);
 
 
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileUserId, setProfileUserId] = useState(null);
+
+  const handleOpenProfile = (id = null) => {
+    setProfileUserId(id);
+    setShowProfile(true);
+  };
+
+  const handleCloseProfile = () => {
+    setShowProfile(false);
+    setProfileUserId(null);
+  };
+
   return (
-    <div className="grid grid-cols-3 p-2 h-screen">
+    <div
+      className="h-screen overflow-hidden"
+      style={{
+        display: "grid",
+        gridTemplateColumns: showProfile ? "0.8fr 1.8fr 0.85fr" : "0.8fr 1.8fr",
+        background: "linear-gradient(135deg, #f0f4ff 0%, #fafbff 50%, #fef9f0 100%)",
+      }}
+    >
       <ContactList
         onUserSelect={handleUserSelect}
         search={search}
         users={users}
         setSearch={setSearch}
+        selectedUserId={selectedUser?.receiverId}
+        onOpenMyProfile={() => handleOpenProfile(null)}
       />
 
       <ChatWindow
         receiverId={selectedUser?.receiverId}
         username={selectedUser?.username}
         messages={messages}
+        onOpenProfile={() => handleOpenProfile(selectedUser?.receiverId)}
       />
 
-      <Profile />
+      {showProfile && (
+        <Profile 
+          userId={profileUserId} 
+          onClose={handleCloseProfile} 
+        />
+      )}
     </div>
   );
 };

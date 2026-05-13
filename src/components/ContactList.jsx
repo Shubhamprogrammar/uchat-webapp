@@ -1,112 +1,156 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt } from 'react-icons/fa';
+import { FaComments, FaEllipsisV, FaSearch, FaSignOutAlt, FaTimes, FaUserCircle } from 'react-icons/fa';
 import { decryptText } from "../utils/crypto";
 
-const ContactList = ({ onUserSelect, search, setSearch, users }) => {
+const ContactList = ({ onUserSelect, search, setSearch, users, selectedUserId, onlineUsers, onOpenMyProfile }) => {
 
-  const { logout } = useAuth();
+  const { logout, user: currentUser } = useAuth();
   const [open, setOpen] = useState(false);
-
   const sortedUsers = [...users].sort((a, b) => {
     return new Date(b.lastMessage?.createdAt || 0) -
       new Date(a.lastMessage?.createdAt || 0);
   });
 
-  
-
   const handleClick = () => {
     logout();
     setOpen(false);
-  }
+  };
+
+  const getAvatarGradient = (name) => {
+    const ch = (name || "U").charAt(0).toUpperCase();
+    const code = ch.charCodeAt(0);
+    const hue = (code * 47) % 360;
+    return `linear-gradient(135deg, hsl(${hue}, 65%, 55%), hsl(${(hue + 35) % 360}, 75%, 42%))`;
+  };
 
   return (
-    <section className='border-r border-r-gray-400'>
-      <div className='flex justify-between mr-5'>
-        <div className="flex items-center justify-center gap-3 ml-4 mb-4">
-          <div className="bg-gradient-to-br from-blue-600 to-blue-800 p-2 rounded-xl shadow-lg transform hover:scale-110 transition-transform duration-300">
-            <FaComments className="text-xl text-white" />
-          </div>
-          <h1 className="text-2xl font-bold">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-amber-600">U</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-blue-900">chat</span>
-          </h1>
-        </div>
-        <div>
-          <FaEllipsisV className="text-xl text-gray-500 absolute top-4 cursor-pointer" onClick={() => setOpen(true)} />
-
-          {open && (
-            <div
-              className="absolute top-8 w-44 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden animate-dropdown"
+    <section
+      className="flex flex-col h-full overflow-hidden"
+      style={{
+        background: "linear-gradient(180deg, #f8faff 0%, #ffffff 100%)",
+        borderRight: "1px solid rgba(0,0,0,0.06)",
+      }}
+    >
+      {/* ─── Header ─── */}
+      <div className="px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={onOpenMyProfile}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm hover:scale-105 transition-all cursor-pointer overflow-hidden border-2 border-white/50"
+              style={{ background: getAvatarGradient(currentUser?.username || "Me") }}
             >
-              <button
-                onClick={() => setOpen(false)}
-                className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 transition ">
-                Cancel
-                <span className="text-xs">✕</span>
-              </button>
-
-              <div className="h-px bg-gray-200" />
-
-              <button
-                onClick={handleClick}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition"
-              >
-                <FaSignOutAlt className="text-base" />
-                Logout
-              </button>
-            </div>
-          )}
-
-        </div>
-      </div>
-      {/* <h2 className='text-xl font-semibold text-gray-700 ml-2  right-0'>Contacts</h2> */}
-      <div className='relative w-full m-auto px-2'>
-
-        <FaSearch className='absolute left-5 top-1/2 -translate-y-1/2 text-small text-gray-600' />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search...."
-          className='pl-10 py-2 m-auto w-full border border-gray-500 font-medium rounded-full' />
-
-      </div>
-      {sortedUsers?.map((user) => (
-        <div
-          key={user.conversationId || user._id}
-          onClick={() =>
-            onUserSelect({
-              receiverId: user.receiver,
-              username: user.username,
-              conversationId: user.conversationId,
-            })
-          }
-          className="cursor-pointer"
-        >
-          <div className="flex items-center p-3 border-b border-gray-300 hover:bg-gray-100">
-            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {user.name?.[0]}
-            </div>
-
-            <div className="ml-4">
-              <p className="text-gray-800 font-medium">{user.username}</p>
-              <p className="text-gray-500 text-sm">{
-                decryptText(user.lastMessage)}</p>
-              {user.unreadCount > 0 && (
-                <span className="bg-green-500 text-white text-xs rounded-full px-2">
-                  {user.unreadCount}
-                </span>
+              {currentUser?.photo ? (
+                <img src={currentUser.photo} alt="me" className="w-full h-full object-cover" />
+              ) : (
+                currentUser?.username?.[0]?.toUpperCase() || "M"
               )}
-            </div>
+            </button>
+            <h1 className="text-lg font-bold tracking-tight">
+              <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #f59e0b, #d97706)" }}>U</span>
+              <span className="bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #1e40af, #1e3a8a)" }}>chat</span>
+            </h1>
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setOpen(!open)}
+              className="w-8 h-8 flex items-center justify-center rounded-xl bg-white/50 border border-gray-100 text-gray-400 hover:text-blue-500 hover:border-blue-100 transition-all cursor-pointer shadow-sm"
+            >
+              <FaEllipsisV size={12} />
+            </button>
+            {open && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+                <div 
+                  className="absolute right-0 top-11 w-44 rounded-2xl z-50 overflow-hidden py-1.5" 
+                  style={{ 
+                    background: "rgba(255,255,255,0.9)", 
+                    backdropFilter: "blur(20px)", 
+                    boxShadow: "0 10px 30px -5px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)" 
+                  }}
+                >
+                  <button 
+                    onClick={() => { onOpenMyProfile(); setOpen(false); }} 
+                    className="w-full flex items-center gap-3 px-4 py-2 text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer"
+                  >
+                    <FaUserCircle size={14} className="opacity-70" />
+                    My Profile
+                  </button>
+                  <div className="h-px bg-gray-50 mx-2 my-1" />
+                  <button 
+                    onClick={handleClick} 
+                    className="w-full flex items-center gap-3 px-4 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    <FaSignOutAlt size={14} className="opacity-70" />
+                    Logout
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      ))}
 
+        <div className="relative mt-2">
+          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 flex items-center justify-center pointer-events-none">
+            <FaSearch className="text-gray-400" size={13} />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search contacts..."
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-xs font-bold text-gray-700 placeholder-gray-400 transition-all duration-200 focus:outline-none bg-white border border-gray-200 shadow-sm focus:border-blue-300 focus:ring-4 focus:ring-blue-50"
+          />
+        </div>
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-2 pb-2 mt-2">
+        {sortedUsers.map((user) => {
+          const userId = user.receiver || user._id;
+          const isActive = selectedUserId === userId;
+          const isOnline = onlineUsers?.includes(userId?.toString());
+          const lastMsg = decryptText(user.lastMessage);
 
+          return (
+            <div
+              key={user.conversationId || user._id}
+              onClick={() => onUserSelect({ receiverId: userId, username: user.username, conversationId: user.conversationId })}
+              className="cursor-pointer mb-1"
+            >
+              <div
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150"
+                style={{
+                  background: isActive ? "rgba(59,130,246,0.08)" : "transparent",
+                  border: isActive ? "1px solid rgba(59,130,246,0.1)" : "1px solid transparent",
+                }}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: getAvatarGradient(user.name) }}>
+                    {user.name?.[0]?.toUpperCase() || "?"}
+                  </div>
+                  {isOnline && (
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-bold text-gray-800 truncate">{user.username}</p>
+                    {user.unreadCount > 0 && (
+                      <span className="flex-shrink-0 w-4 h-4 flex items-center justify-center text-[9px] font-bold text-white rounded-full bg-green-500">
+                        {user.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-gray-400 truncate mt-0.5">{lastMsg || "Tap to chat"}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </section>
-  )
-}
+  );
+};
 
-export default ContactList
+export default ContactList;

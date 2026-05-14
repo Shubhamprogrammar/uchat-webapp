@@ -3,12 +3,15 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { connectSocket, disconnectSocket } from "../utils/socket";
 
+import axios from "axios";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading,setLoading]=useState(true);
   const navigate=useNavigate();
+  const HOST = import.meta.env.VITE_BACKEND_URL;
 
   // 🔐 LOGIN FUNCTION
   const login = (data) => {
@@ -29,6 +32,21 @@ export const AuthProvider = ({ children }) => {
 
   // Restore user on refresh
   useEffect(() => {
+    const fetchProfile = async (token) => {
+      try {
+        const response = await axios.get(`${HOST}/api/auth/self-user`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUser(response.data);
+        connectSocket();
+      } catch (err) {
+        console.error("Error fetching profile", err);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -43,15 +61,11 @@ export const AuthProvider = ({ children }) => {
       if (decoded.exp * 1000 < Date.now()) {
         logout();
       } else {
-        setUser({
-          id: decoded.id,
-        });
-        connectSocket(); 
+        fetchProfile(token);
       }
     } catch (err) {
       console.error("Invalid token", err);
       logout();
-    } finally {
       setLoading(false);
     }
   }, []);

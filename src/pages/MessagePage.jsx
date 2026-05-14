@@ -239,6 +239,7 @@ const MessagePage = () => {
       <ChatWindow
         receiverId={selectedUser?.receiverId}
         username={selectedUser?.username}
+        photo={selectedUser?.photo}
         messages={messages}
         onOpenProfile={() => handleOpenProfile(selectedUser?.receiverId)}
       />

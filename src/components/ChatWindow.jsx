@@ -6,7 +6,7 @@ import { FaComments, FaSmile } from "react-icons/fa";
 import { getDateLabel, formatTime } from "../utils/dateUtils.jsx";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
-const ChatWindow = ({ receiverId, username, messages, onlineUsers, onOpenProfile }) => {
+const ChatWindow = ({ receiverId, username, photo, messages, onlineUsers, onOpenProfile }) => {
   const [input, setInput] = useState("");
   const { user } = useAuth();
   const messagesRef = useRef(null);
@@ -70,10 +70,14 @@ const ChatWindow = ({ receiverId, username, messages, onlineUsers, onOpenProfile
             }}
           >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden"
               style={{ background: getAvatarGradient(username) }}
             >
-              {username?.[0]?.toUpperCase()}
+              {photo ? (
+                <img src={photo} alt={username} className="w-full h-full object-cover" />
+              ) : (
+                username?.[0]?.toUpperCase()
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <h2 className="text-sm font-bold text-gray-800 truncate leading-tight">

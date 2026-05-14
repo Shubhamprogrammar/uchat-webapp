@@ -115,7 +115,12 @@ const ContactList = ({ onUserSelect, search, setSearch, users, selectedUserId, o
           return (
             <div
               key={user.conversationId || user._id}
-              onClick={() => onUserSelect({ receiverId: userId, username: user.username, conversationId: user.conversationId })}
+              onClick={() => onUserSelect({ 
+                receiverId: userId, 
+                username: user.username, 
+                conversationId: user.conversationId,
+                photo: user.photo 
+              })}
               className="cursor-pointer mb-1"
             >
               <div
@@ -126,8 +131,12 @@ const ContactList = ({ onUserSelect, search, setSearch, users, selectedUserId, o
                 }}
               >
                 <div className="relative flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs" style={{ background: getAvatarGradient(user.name) }}>
-                    {user.name?.[0]?.toUpperCase() || "?"}
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs overflow-hidden" style={{ background: getAvatarGradient(user.name) }}>
+                    {user.photo ? (
+                      <img src={user.photo} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      user.name?.[0]?.toUpperCase() || "?"
+                    )}
                   </div>
                   {isOnline && (
                     <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />

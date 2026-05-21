@@ -1,7 +1,7 @@
 # 💬 UChat — Real-time Web Chat Application
 
 UChat is a modern real-time chat web application built with **React**, designed for speed, scalability, and simplicity.  
-It enables seamless one-on-one or group conversations with a clean, minimal UI.
+It enables seamless one-on-one conversations with a clean, minimal UI.
 
 ---
 

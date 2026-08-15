@@ -9,7 +9,7 @@ const Login = ({ switchToSignup }) => {
     const [otp, setOtp] = useState("");
     const [timer, setTimer] = useState(0);
     const [errors, setErrors] = useState({});
-    const [mobile, setMobile] = useState("");
+    const [email, setEmail] = useState("");
     const [focusedField, setFocusedField] = useState(null);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -47,22 +47,21 @@ const Login = ({ switchToSignup }) => {
     }, []);
 
     /* -------------------- VALIDATION -------------------- */
-    const validateMobile = () => {
+    const validateEmail = () => {
         let temp = {};
-        if (!mobile.trim()) {
-            temp.mobile = "Mobile number is required";
-        } else if (!/^\d{10}$/.test(mobile)) {
-            temp.mobile = "Mobile number must be 10 digits";
+        if (!email.trim()) {
+            temp.email = "Email is required";
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+            temp.email = "Enter a valid email address";
         }
         setErrors(temp);
         return Object.keys(temp).length === 0;
     };
 
     /* -------------------- HANDLERS -------------------- */
-    const handleMobileChange = (e) => {
-        const value = e.target.value.replace(/\D/g, ""); // digits only
-        setMobile(value);
-        setErrors(prev => ({ ...prev, mobile: "" }));
+    const handleEmailChange = (e) => {
+        setEmail(e.target.value);
+        setErrors(prev => ({ ...prev, email: "" }));
     };
 
     const handleOtpChange = (e) => {
@@ -84,18 +83,18 @@ const Login = ({ switchToSignup }) => {
 
         /* -------- STEP 1: SEND OTP -------- */
         if (!otpSent) {
-            if (!validateMobile()) {
+            if (!validateEmail()) {
                 setLoading(false);
                 return;
             }
             try {
                 await axios.post(`${HOST}/api/auth/send-otp`, {
-                    mobile,
+                    email: email.trim(),
                     label: "login"
                 });
                 setOtpSent(true);
                 startTimer();
-                toast.success("OTP sent successfully");
+                toast.success("OTP sent to your email successfully");
 
             } catch (error) {
                 toast.error(error.response?.data?.message || "Failed to send OTP");
@@ -112,7 +111,7 @@ const Login = ({ switchToSignup }) => {
 
         try {
             const res = await axios.post(`${HOST}/api/auth/verify-otp`, {
-                mobile,
+                email: email.trim(),
                 otp,
                 label: "login"
             });
@@ -134,12 +133,12 @@ const Login = ({ switchToSignup }) => {
 
         try {
             await axios.post(`${HOST}/api/auth/send-otp`, {
-                mobile,
+                email: email.trim(),
                 label: "login"
             });
 
             startTimer();
-            toast.success("OTP resent successfully");
+            toast.success("OTP resent successfully to your email");
 
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to resend OTP");
@@ -164,35 +163,35 @@ const Login = ({ switchToSignup }) => {
                 Welcome Back !
             </h1>
 
-            {/* MOBILE FIELD */}
+            {/* EMAIL FIELD */}
             <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mobile Number
+                    Email Address
                     <span className="text-red-500 ml-0.5">*</span>
                 </label>
 
                 <input
-                    type="tel"
-                    name="mobile"
-                    placeholder="9876543210"
-                    value={mobile}
+                    type="email"
+                    name="email"
+                    placeholder="user@example.com"
+                    value={email}
                     disabled={otpSent}
-                    onChange={handleMobileChange}
-                    onFocus={() => setFocusedField('mobile')}
+                    onChange={handleEmailChange}
+                    onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl transition-all duration-200 outline-none
                         ${otpSent ? "border-blue-300 cursor-not-allowed" :
-                            focusedField === 'mobile'
+                            focusedField === 'email'
                                 ? 'border-blue-500 bg-white shadow-sm'
-                                : errors.mobile
+                                : errors.email
                                     ? 'border-red-300'
                                     : 'hover:border-blue-300'
                         }`}
                 />
 
-                {errors.mobile && (
+                {errors.email && (
                     <p className="mt-1.5 text-xs text-red-500">
-                        {errors.mobile}
+                        {errors.email}
                     </p>
                 )}
             </div>
@@ -216,10 +215,13 @@ const Login = ({ switchToSignup }) => {
             {otpSent && (
                 <>
                     <div className="pt-2 border-t-2 border-gray-100">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
                             Enter OTP
                             <span className="text-red-500 ml-0.5">*</span>
                         </label>
+                        <p className="text-xs text-blue-600 mb-2 font-medium">
+                            An OTP has been sent to your email address ({email})
+                        </p>
 
                         <input
                             type="text"

@@ -1,6 +1,7 @@
 import {
   FaUser,
   FaPhone,
+  FaEnvelope,
   FaBirthdayCake,
   FaVenusMars,
   FaEdit,
@@ -205,13 +206,22 @@ const Profile = ({ userId, onClose }) => {
           />
 
           {isSelf && (
-            <InfoRow
-              icon={FaPhone}
-              label="Primary Mobile"
-              value={user?.mobile}
-              fieldName="mobile"
-              editable={false}
-            />
+            <>
+              <InfoRow
+                icon={FaEnvelope}
+                label="Email Address"
+                value={user?.email}
+                fieldName="email"
+                editable={false}
+              />
+              <InfoRow
+                icon={FaPhone}
+                label="Primary Mobile"
+                value={user?.mobile}
+                fieldName="mobile"
+                editable={false}
+              />
+            </>
           )}
         </div>
       </div>

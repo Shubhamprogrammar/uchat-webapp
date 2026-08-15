@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const Signup = ({ switchToLogin }) => {
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     mobile: "",
     username: "",
     dob: null,
@@ -20,6 +22,7 @@ const Signup = ({ switchToLogin }) => {
   const [loading, setLoading] = useState(false);
   const HOST = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const validate = () => {
     let temp = {};
@@ -27,6 +30,11 @@ const Signup = ({ switchToLogin }) => {
       temp.name = "Name is required";
     } else if (!/^[a-zA-Z\s]{3,}$/.test(formData.name)) {
       temp.name = "Name must be at least 3 letters";
+    }
+    if (!formData.email?.trim()) {
+      temp.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      temp.email = "Enter a valid email address";
     }
     if (!formData.username.trim()) {
       temp.username = "Username is required";
@@ -70,7 +78,7 @@ const Signup = ({ switchToLogin }) => {
         await axios.post(`${HOST}/api/auth/send-otp`, {...formData, label: "signup"});
         setOtpSent(true);
         startTimer();
-        toast.success("OTP Sent Successfully");
+        toast.success("OTP has been sent to your email address");
       } catch (error) {
         toast.error(error.response?.data?.message || "Failed to send OTP, Try again");
       }
@@ -94,6 +102,7 @@ const Signup = ({ switchToLogin }) => {
       });
 
       toast.success(res.data.message || "Signup Successful!");
+      login(res.data);
       navigate('/message');
 
     } catch (error) {
@@ -124,7 +133,7 @@ const Signup = ({ switchToLogin }) => {
     try {
       await axios.post(`${HOST}/api/auth/send-otp`, {...formData, label: "signup"});
       startTimer();
-      toast.success("OTP Resent Successfully");
+      toast.success("OTP has been resent to your email address");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to resend OTP, Try again");
     }
@@ -170,6 +179,35 @@ const Signup = ({ switchToLogin }) => {
           {errors.name && (
             <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
               {errors.name}
+            </p>
+          )}
+        </div>
+
+        {/* Email Input */}
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email Address<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
+          </label>
+          <div className="relative">
+            <input
+              type="email"
+              name="email"
+              placeholder="user@example.com"
+              onChange={handleChange}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+              value={formData.email}
+              className={`w-full pl-4 pr-4 py-3 border-2 rounded-xl bg-gray-50 transition-all duration-200 outline-none ${focusedField === 'email'
+                ? 'border-blue-500 bg-white shadow-sm'
+                : errors.email
+                  ? 'border-red-300'
+                  : 'border-gray-200 hover:border-gray-300'
+                }`}
+            />
+          </div>
+          {errors.email && (
+            <p className="mt-1.5 text-xs text-red-500 flex items-center gap-1">
+              {errors.email}
             </p>
           )}
         </div>
@@ -289,9 +327,12 @@ const Signup = ({ switchToLogin }) => {
         {/* OTP Section */}
         {otpSent && (
           <div className="pt-2 border-t-2 border-gray-100">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Enter OTP<span className="text-red-500 ml-0.5" aria-hidden="true">*</span>
             </label>
+            <p className="text-xs text-blue-600 mb-2 font-medium">
+              An OTP has been sent to your email address ({formData.email})
+            </p>
             <div className="relative">
               <input
                 type="text"
